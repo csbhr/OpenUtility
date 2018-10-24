@@ -42,13 +42,6 @@ for i in samples_list:
 
 print("----------------")
 
-groups=mst.group([x,y],4)
-
-for i in groups:
-    print(i[0])
-    print(i[1])
-    print()
-
 
 
 # x = numpy.mat([[0, 0, 0],
