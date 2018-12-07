@@ -1,36 +1,73 @@
 import os
 import pickle
+import configparser
+import csv
 
 
-#  将txtList中的数据写入到文件fileName中
-def writeTxt(filePath, txtList):
-    with open(filePath, "w") as theFile:
-        for line in txtList:
+def write_txt(file_path, txt_list):
+    '''
+    write list into file
+    :param file_path: the file's path
+    :param txt_list: the list of file's content
+    :return: none
+    '''
+    with open(file_path, "w") as theFile:
+        for line in txt_list:
             theFile.write(line + "\n")
 
 
-# 将文件fileName中数据读出，以list的形式返回
-def readTxt(filePath):
-    txtSet = list([])
-    with open(filePath) as theFile:
+def read_txt(file_path):
+    '''
+    read file into list
+    :param file_path: the file's path
+    :return: the list of file's content
+    '''
+    txt_list = []
+    with open(file_path) as theFile:
         for line in theFile:
-            txtSet.append(line.strip())
-    return txtSet
+            txt_list.append(line.strip())
+    return txt_list
 
 
-# 获取路径path中所有文件和文件夹名
-def get_allFile_byPath(path):
+def get_all_file_by_path(path):
+    '''
+    get all files' name from the path
+    :param path: the path
+    :return: the list of all files' name
+    '''
     return os.listdir(path)
 
 
-# 利用pickle模块，将list对象序列化到文件filePath中
-def pickle_dump(filePath, list):
-    with open(filePath, "wb") as f:
-        pickle.dump(list, f)
+def pickle_dump(file_path, content_list):
+    '''
+    dump the list into the file using pickle module
+    :param file_path: the file's path
+    :param content_list: the list of content
+    :return: none
+    '''
+    with open(file_path, "wb") as f:
+        pickle.dump(content_list, f)
 
 
-# 利用pickle模块，将文件filePath反序列化并返回
-def pickle_load(filePath):
-    with open(filePath, "rb") as f:
-        list = pickle.load(f)
-    return list
+def pickle_load(file_path):
+    '''
+    load the file's content into list using pickle module
+    :param file_path: the file's path
+    :return: the list of content
+    '''
+    with open(file_path, "rb") as f:
+        content_list = pickle.load(f)
+    return content_list
+
+
+def get_ini_value(file_path, section_name, key_name):
+    '''
+    get ini file's value
+    :param file_path: the file path
+    :param section_name: the section name
+    :param key_name: the key name
+    :return: the value
+    '''
+    conf = configparser.ConfigParser()
+    conf.read(file_path)
+    return conf.get(section_name, key_name)
