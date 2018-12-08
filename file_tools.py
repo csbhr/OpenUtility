@@ -1,7 +1,8 @@
 import os
 import pickle
 import configparser
-import csv
+import pandas as pd
+import numpy as np
 
 
 def write_txt(file_path, txt_list):
@@ -71,3 +72,15 @@ def get_ini_value(file_path, section_name, key_name):
     conf = configparser.ConfigParser()
     conf.read(file_path)
     return conf.get(section_name, key_name)
+
+
+def read_csv_array(file_path, header=None):
+    '''
+    read csv file into np.array
+    :param file_path: the csv file's path
+    :param header: row number(s) to use as the column names (int, list of ints), default None
+    :return: the np.array of csv file's content
+    '''
+    csv_data = pd.read_csv(file_path, header=header)
+    csv_array = np.array(csv_data)
+    return csv_array
