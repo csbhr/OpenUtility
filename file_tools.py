@@ -84,3 +84,30 @@ def read_csv_array(file_path, header=None):
     csv_data = pd.read_csv(file_path, header=header)
     csv_array = np.array(csv_data)
     return csv_array
+
+
+def read_csv_list(file_path, header=None):
+    '''
+    read csv file into list
+    :param file_path: the csv file's path
+    :param header: row number(s) to use as the column names (int, list of ints), default None
+    :return: the list of csv file's content
+    '''
+    csv_data = pd.read_csv(file_path, header=header)
+    csv_array = np.array(csv_data)
+    csv_list = csv_array.tolist()
+    return csv_list
+
+
+def write_csv(file_path, content_list, index=False, header=False):
+    '''
+    write list of content into csv file
+    :param file_path:  the csv file's path
+    :param content_list: the list of csv file's content
+    :param index: store the index of row, default False
+    :param header: store the column names of row, default False
+    :return: none
+    '''
+    content_array = np.array(content_list)
+    data = pd.DataFrame(content_array)
+    data.to_csv(file_path, index=index, header=header)
