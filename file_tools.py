@@ -115,6 +115,15 @@ def write_csv(file_path, content_list, index=False, header=False):
 
 
 def read_xml_list_dictionary(file_path):
+    '''
+    read xml only with objects
+    one object only has some attribute
+        attribute has one sub-attribute
+    object described by dictionary
+        attributes are keys
+    :param file_path: xml file path
+    :return: a list of objects
+    '''
     tree = ET.parse(file_path)
     root = tree.getroot()
     children = root.getchildren()
