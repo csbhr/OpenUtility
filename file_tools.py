@@ -3,6 +3,7 @@ import pickle
 import configparser
 import pandas as pd
 import numpy as np
+import xml.etree.ElementTree as ET
 
 
 def write_txt(file_path, txt_list):
@@ -111,3 +112,16 @@ def write_csv(file_path, content_list, index=False, header=False):
     content_array = np.array(content_list)
     data = pd.DataFrame(content_array)
     data.to_csv(file_path, index=index, header=header)
+
+
+def read_xml_list_dictionary(file_path):
+    tree = ET.parse(file_path)
+    root = tree.getroot()
+    children = root.getchildren()
+    objects = []
+    for child in children:
+        one_object = {}
+        for attr in child.getchildren():
+            one_object[attr.tag] = attr.text
+        objects.append(one_object)
+    return objects
