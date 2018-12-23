@@ -87,6 +87,18 @@ def read_csv_array(file_path, header=None):
     return csv_array
 
 
+def read_csv_mat(file_path, header=None):
+    '''
+    read csv file into np.mat
+    :param file_path: the csv file's path
+    :param header: row number(s) to use as the column names (int, list of ints), default None
+    :return: the np.mat of csv file's content
+    '''
+    csv_data = pd.read_csv(file_path, header=header)
+    csv_mat = np.mat(csv_data)
+    return csv_mat
+
+
 def read_csv_list(file_path, header=None):
     '''
     read csv file into list
