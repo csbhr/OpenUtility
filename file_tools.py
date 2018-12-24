@@ -6,18 +6,6 @@ import numpy as np
 import xml.etree.ElementTree as ET
 
 
-def write_txt(file_path, txt_list):
-    '''
-    write list into file
-    :param file_path: the file's path
-    :param txt_list: the list of file's content
-    :return: none
-    '''
-    with open(file_path, "w") as theFile:
-        for line in txt_list:
-            theFile.write(line + "\n")
-
-
 def read_txt(file_path):
     '''
     read file into list
@@ -29,6 +17,30 @@ def read_txt(file_path):
         for line in theFile:
             txt_list.append(line.strip())
     return txt_list
+
+
+def write_txt(file_path, txt_list):
+    '''
+    write list into file
+    :param file_path: the file's path
+    :param txt_list: the list of file's content
+    :return: none
+    '''
+    with open(file_path, "w") as theFile:
+        for line in txt_list:
+            theFile.write(str(line) + "\n")
+
+
+def append_txt(file_path, txt_list):
+    '''
+    append list after file
+    :param file_path: the file's path
+    :param txt_list: the list of file's content
+    :return: none
+    '''
+    with open(file_path, "a") as theFile:
+        for line in txt_list:
+            theFile.write(str(line) + "\n")
 
 
 def get_all_file_by_path(path):
