@@ -4,6 +4,7 @@ import configparser
 import pandas as pd
 import numpy as np
 import xml.etree.ElementTree as ET
+import shutil
 
 
 def read_txt(file_path):
@@ -158,3 +159,14 @@ def read_xml_list_dictionary(file_path):
             one_object[attr.tag] = attr.text
         objects.append(one_object)
     return objects
+
+
+def copy_files(origin_file_paths, dest_file_paths):
+    '''
+    copy files from origin path to dest path
+    :param origin_file_paths: a list, origin files' full path
+    :param dest_file_paths: a list, dest files' full path
+    :return:
+    '''
+    for ori, dest in origin_file_paths, dest_file_paths:
+        shutil.copyfile(ori, dest)
