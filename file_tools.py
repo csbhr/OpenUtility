@@ -168,5 +168,5 @@ def copy_files(origin_file_paths, dest_file_paths):
     :param dest_file_paths: a list, dest files' full path
     :return:
     '''
-    for ori, dest in origin_file_paths, dest_file_paths:
+    for ori, dest in zip(origin_file_paths, dest_file_paths):
         shutil.copyfile(ori, dest)
