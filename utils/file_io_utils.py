@@ -1,8 +1,6 @@
 import scipy.io as scio
 import pandas as pd
 import numpy as np
-import configparser
-import xml.etree.ElementTree as ET
 
 
 #################################################################################
@@ -94,44 +92,3 @@ def write_csv(file_path, data, row_names=None, col_names=None):
         assert content_array.shape[1] == len(col_names), 'the number of data cols must equal to len(col_names)'
     data = pd.DataFrame(content_array, index=row_names, columns=col_names)
     data.to_csv(file_path, index=index, header=header)
-
-
-#################################################################################
-####                            ini file I/O                                 ####
-#################################################################################
-def get_ini_value(file_path, section_name, key_name):
-    '''
-    get ini file's value
-    :param file_path: the file path
-    :param section_name: the section name
-    :param key_name: the key name
-    :return: the value
-    '''
-    conf = configparser.ConfigParser()
-    conf.read(file_path)
-    return conf.get(section_name, key_name)
-
-
-#################################################################################
-####                            xml file I/O                                 ####
-#################################################################################
-def read_xml_list_dictionary(file_path):
-    '''
-    read xml only with objects
-    one object only has some attribute
-        attribute has one sub-attribute
-    object described by dictionary
-        attributes are keys
-    :param file_path: xml file path
-    :return: a list of objects
-    '''
-    tree = ET.parse(file_path)
-    root = tree.getroot()
-    children = root.getchildren()
-    objects = []
-    for child in children:
-        one_object = {}
-        for attr in child.getchildren():
-            one_object[attr.tag] = attr.text
-        objects.append(one_object)
-    return objects

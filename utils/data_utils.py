@@ -4,7 +4,6 @@ import torch.nn.functional as F
 import numpy as np
 import math
 from torch.autograd import Variable
-from skimage import color as sc
 import cv2
 
 
@@ -29,26 +28,10 @@ def get_patch(*args, patch_size=17, scale=1):
     return ret
 
 
-def set_channel(*args, n_channels=3):
-    def _set_channel(img):
-        if img.ndim == 2:
-            img = np.expand_dims(img, axis=2)
-
-        c = img.shape[2]
-        if n_channels == 1 and c == 3:
-            img = sc.rgb2ycbcr(img)
-        elif n_channels == 3 and c == 1:
-            img = np.concatenate([img] * n_channels, 2)
-
-        return img
-
-    return [_set_channel(a) for a in args]
-
-
-def np2Tensor(*args, rgb_range=255, n_colors=1):
+def np2Tensor(*args, rgb_range=255):
     def _np2Tensor(img):
         img = img.astype('float64')
-        np_transpose = np.ascontiguousarray(img.transpose((2, 0, 1)))  # NHWC -> NCHW
+        np_transpose = np.ascontiguousarray(img.transpose((2, 0, 1)))  # HWC -> CHW
         tensor = torch.from_numpy(np_transpose).float()  # numpy -> tensor
         tensor.mul_(rgb_range / 255)  # (0,255) -> (0,1)
 
@@ -75,20 +58,20 @@ def data_augment(*args, hflip=True, rot=True):
     return [_augment(a) for a in args]
 
 
-def postprocess(*images, rgb_range, ycbcr_flag, device):
-    def _postprocess(img, rgb_coefficient, ycbcr_flag, device):
-        if ycbcr_flag:
-            out = img.mul(rgb_coefficient).clamp(16, 235)
-        else:
-            out = img.mul(rgb_coefficient).clamp(0, 255).round()
+def postprocess(*images, rgb_range):
+    def _postprocess(img, rgb_coefficient):
+        img = img.mul(rgb_coefficient).clamp(0, 255).round()
 
-        return out
+        img = img[0].data.cpu().numpy()  # BCHW -> CHW
+        img = np.transpose(img, (1, 2, 0)).astype(np.uint8)  # CHW -> HWC
+
+        return img
 
     rgb_coefficient = 255 / rgb_range
-    return [_postprocess(img, rgb_coefficient, ycbcr_flag, device) for img in images]
+    return [_postprocess(img, rgb_coefficient) for img in images]
 
 
-def calc_psnr(img1, img2, rgb_range=1., shave=4, is_rgb=False):
+def calc_psnr(img1, img2, rgb_range=1., shave=4):
     if isinstance(img1, torch.Tensor):
         img1 = img1[:, :, shave:-shave, shave:-shave]
         img1 = img1.to('cpu').numpy()
@@ -153,61 +136,6 @@ def warp_by_flow(x, flo, device='cuda'):
     output = F.grid_sample(x, vgrid, padding_mode='border')
 
     return output
-
-
-#################################################################################
-####                        Tensor RGB PSNR SSIM                             ####
-#################################################################################
-
-
-def PSNR_Tensor_RGB(img1, img2, rgb_range=1., shave=4):
-    if isinstance(img1, torch.Tensor):
-        img1 = img1[:, :, shave:-shave, shave:-shave]
-        img1 = img1.to('cpu').numpy()
-    if isinstance(img2, torch.Tensor):
-        img2 = img2[:, :, shave:-shave, shave:-shave]
-        img2 = img2.to('cpu').numpy()
-    mse = np.mean((img1 / rgb_range - img2 / rgb_range) ** 2)
-    if mse == 0:
-        return 100
-    PIXEL_MAX = 1
-    return 20 * math.log10(PIXEL_MAX / math.sqrt(mse))
-
-
-def SSIM_Tensor_RGB(img1, img2):
-    def create_window(window_size, channel):
-        def gaussian(window_size, sigma):
-            gauss = torch.Tensor(
-                [math.exp(-(x - window_size / 2) ** 2 / float(2 * sigma ** 2)) for x in range(window_size)])
-            return gauss / gauss.sum()
-
-        _1D_window = gaussian(window_size, 1.5).unsqueeze(1)
-        _2D_window = _1D_window.mm(_1D_window.t()).float().unsqueeze(0).unsqueeze(0)
-        window = Variable(_2D_window.expand(channel, 1, window_size, window_size))
-        return window
-
-    img1 = img1.to('cpu')
-    img2 = img2.to('cpu')
-
-    (_, channel, _, _) = img1.size()
-    window_size = 11
-    window = create_window(window_size, channel)
-    mu1 = F.conv2d(img1, window, padding=window_size // 2, groups=channel)
-    mu2 = F.conv2d(img2, window, padding=window_size // 2, groups=channel)
-
-    mu1_sq = mu1.pow(2)
-    mu2_sq = mu2.pow(2)
-    mu1_mu2 = mu1 * mu2
-
-    sigma1_sq = F.conv2d(img1 * img1, window, padding=window_size // 2, groups=channel) - mu1_sq
-    sigma2_sq = F.conv2d(img2 * img2, window, padding=window_size // 2, groups=channel) - mu2_sq
-    sigma12 = F.conv2d(img1 * img2, window, padding=window_size // 2, groups=channel) - mu1_mu2
-
-    C1 = 0.01 ** 2
-    C2 = 0.03 ** 2
-
-    ssim_map = ((2 * mu1_mu2 + C1) * (2 * sigma12 + C2)) / ((mu1_sq + mu2_sq + C1) * (sigma1_sq + sigma2_sq + C2))
-    return ssim_map.mean()
 
 
 #################################################################################

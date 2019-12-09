@@ -1,5 +1,5 @@
-from utils import calc_model_params
+from utils import calc_parmeters
 
-net = None
+net = None  # init model
 
-calc_model_params.cal_parmeters(net)
+calc_parmeters.cal_parmeters(net)

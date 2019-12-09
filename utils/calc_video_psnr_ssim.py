@@ -167,13 +167,13 @@ def calc_video_PSNR_SSIM_byName(ouput_root, gt_root, crop_border=4, test_ycbcr=F
     return PSNR_SSIM_csv_log
 
 
-def batch_calc_video_PSNR_SSIM_toCSV(root_list, save_csv_root, crop_border=7, test_ycbcr=False,
+def batch_calc_video_PSNR_SSIM_toCSV(root_list, save_csv_root, crop_border=4, test_ycbcr=False,
                                      combine_save=False, match_byname=False):
     total_csv_log = []
     for i, root in enumerate(root_list):
         ouput_root = root['output']
         gt_root = root['gt']
-        print(">>>>  new test >>>>")
+        print(">>>>  now test >>>>")
         print(">>>>  output: {}".format(ouput_root))
         print(">>>>  gt: {}".format(gt_root))
         if match_byname:
