@@ -8,7 +8,7 @@ experiment_list = [
     'experiment_dirname',
 ]
 
-max_epoch = 450
+max_epoch = 9999
 
 loss_array_list = []
 psnr_array_list = []
