@@ -2,21 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4eda5716-1d3a-4e8a-b853-b5c2c0317a5f" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/temp_sr_metric.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_corr.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_params.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_params.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_regroup_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_regroup_video_dataset.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_video_psnr_ssim.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_video_psnr_ssim.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/calc_model_params.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/calc_video_psnr_ssim.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/calc_video_psnr_ssim.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/data_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/data_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/file_io_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/file_io_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/image_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/image_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/mysql_utils.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/pca_utils.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/string_utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_curve.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_curve.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -227,7 +213,7 @@
       <workItem from="1574926341076" duration="9643000" />
       <workItem from="1575183090205" duration="646000" />
       <workItem from="1575624296239" duration="969000" />
-      <workItem from="1575856708385" duration="1384000" />
+      <workItem from="1575856708385" duration="1566000" />
     </task>
     <servers />
   </component>

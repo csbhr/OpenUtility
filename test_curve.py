@@ -2,26 +2,10 @@ from utils.visual_utils import plot_multi_curve
 import torch
 
 label_list = [
-    'baseline',
-    'flow_finetune',
-    'Iteration',
-    # 'Iteration-mask-woFilter',
-    'Iteration-mask-filter',
-    # 'Iteration-mask-sustain',
-    # 'RAmap',
-    # 'RAmap-woUpdate',
-    # 'RAmap-v2'
+    'experiment_flag',
 ]
 experiment_list = [
-    'SRN_Video_Deblur',
-    'PWC_SRN_Video_Deblur_finetune',
-    'Iterate_PWC_SRN_Video_Deblur',
-    # 'Iterate_PWC_Mask_SRN_Video_Deblur_woFilter',
-    'Iterate_PWC_Mask_SRN_Video_Deblur_filter',
-    # 'Iterate_PWC_Mask_Sustain_SRN_Video_Deblur',
-    # 'PWC_RAmap_SRN_Video_Deblur',
-    # 'PWC_RAmap_SRN_Video_Deblur-woUpdate',
-    # 'PWC_RAmap_SRN_Video_Deblur_v2'
+    'experiment_dirname',
 ]
 
 max_epoch = 450
