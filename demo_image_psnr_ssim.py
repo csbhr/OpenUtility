@@ -29,4 +29,8 @@ root_list = [
     },
 ]
 
-batch_calc_image_PSNR_SSIM(root_list)
+log_list = batch_calc_image_PSNR_SSIM(root_list)
+print("--------------------------------------------------------------------------------------")
+for i, log in enumerate(log_list):
+    print(">> The {}-th:".format(i), log['data_path'])
+    print(log['log'])
