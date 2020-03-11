@@ -32,14 +32,18 @@ def calc_image_PSNR_SSIM(ouput_root, gt_root, crop_border=4, test_ycbcr=False):
             im_Gen = data_utils.bgr2ycbcr(im_Gen)
 
         # crop borders
-        if im_GT.ndim == 3:
-            cropped_GT = im_GT[crop_border:-crop_border, crop_border:-crop_border, :]
-            cropped_Gen = im_Gen[crop_border:-crop_border, crop_border:-crop_border, :]
-        elif im_GT.ndim == 2:
-            cropped_GT = im_GT[crop_border:-crop_border, crop_border:-crop_border]
-            cropped_Gen = im_Gen[crop_border:-crop_border, crop_border:-crop_border]
+        if crop_border != 0:
+            if im_GT.ndim == 3:
+                cropped_GT = im_GT[crop_border:-crop_border, crop_border:-crop_border, :]
+                cropped_Gen = im_Gen[crop_border:-crop_border, crop_border:-crop_border, :]
+            elif im_GT.ndim == 2:
+                cropped_GT = im_GT[crop_border:-crop_border, crop_border:-crop_border]
+                cropped_Gen = im_Gen[crop_border:-crop_border, crop_border:-crop_border]
+            else:
+                raise ValueError('Wrong image dimension: {}. Should be 2 or 3.'.format(im_GT.ndim))
         else:
-            raise ValueError('Wrong image dimension: {}. Should be 2 or 3.'.format(im_GT.ndim))
+            cropped_GT = im_GT
+            cropped_Gen = im_Gen
 
         psnr = data_utils.PSNR_EDVR(cropped_GT * 255, cropped_Gen * 255)
         ssim = data_utils.SSIM_EDVR(cropped_GT * 255, cropped_Gen * 255)
@@ -48,16 +52,23 @@ def calc_image_PSNR_SSIM(ouput_root, gt_root, crop_border=4, test_ycbcr=False):
 
         print("{} PSNR={:.5}, SSIM={:.4}".format(o_im, psnr, ssim))
 
-    print('Average PSNR={:.5}, SSIM={:.4}'.format(sum(PSNR_list) / len(PSNR_list), sum(SSIM_list) / len(SSIM_list)))
+    log = 'Average PSNR={:.5}, SSIM={:.4}'.format(sum(PSNR_list) / len(PSNR_list), sum(SSIM_list) / len(SSIM_list))
+    print(log)
 
-    return PSNR_list, SSIM_list
+    return PSNR_list, SSIM_list, log
 
 
 def batch_calc_image_PSNR_SSIM(root_list, crop_border=4, test_ycbcr=False):
+    log_list = []
     for i, root in enumerate(root_list):
         ouput_root = root['output']
         gt_root = root['gt']
         print(">>>>  now test >>>>")
         print(">>>>  output: {}".format(ouput_root))
         print(">>>>  gt: {}".format(gt_root))
-        calc_image_PSNR_SSIM(ouput_root, gt_root, crop_border=crop_border, test_ycbcr=test_ycbcr)
+        _, _, log = calc_image_PSNR_SSIM(ouput_root, gt_root, crop_border=crop_border, test_ycbcr=test_ycbcr)
+        log_list.append({
+            'data_path': ouput_root,
+            'log': log
+        })
+    return log_list

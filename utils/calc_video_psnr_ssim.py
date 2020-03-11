@@ -129,14 +129,18 @@ def calc_video_PSNR_SSIM_byName(ouput_root, gt_root, crop_border=4, test_ycbcr=F
                 im_Gen = data_utils.bgr2ycbcr(im_Gen)
 
             # crop borders
-            if im_GT.ndim == 3:
-                cropped_GT = im_GT[crop_border:-crop_border, crop_border:-crop_border, :]
-                cropped_Gen = im_Gen[crop_border:-crop_border, crop_border:-crop_border, :]
-            elif im_GT.ndim == 2:
-                cropped_GT = im_GT[crop_border:-crop_border, crop_border:-crop_border]
-                cropped_Gen = im_Gen[crop_border:-crop_border, crop_border:-crop_border]
+            if crop_border != 0:
+                if im_GT.ndim == 3:
+                    cropped_GT = im_GT[crop_border:-crop_border, crop_border:-crop_border, :]
+                    cropped_Gen = im_Gen[crop_border:-crop_border, crop_border:-crop_border, :]
+                elif im_GT.ndim == 2:
+                    cropped_GT = im_GT[crop_border:-crop_border, crop_border:-crop_border]
+                    cropped_Gen = im_Gen[crop_border:-crop_border, crop_border:-crop_border]
+                else:
+                    raise ValueError('Wrong image dimension: {}. Should be 2 or 3.'.format(im_GT.ndim))
             else:
-                raise ValueError('Wrong image dimension: {}. Should be 2 or 3.'.format(im_GT.ndim))
+                cropped_GT = im_GT
+                cropped_Gen = im_Gen
 
             psnr = data_utils.PSNR_EDVR(cropped_GT * 255, cropped_Gen * 255)
             ssim = data_utils.SSIM_EDVR(cropped_GT * 255, cropped_Gen * 255)
