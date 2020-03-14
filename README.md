@@ -5,6 +5,8 @@ There are some useful tools for low-level vision tasks.
 - [Calculate the PSNR/SSIM of videos](#chapter-2)
 - [Calculate the properties of model](#chapter-3)
 
+---
+
 <a name="chapter-1"></a>
 ### Calculate the PSNR/SSIM of images
 - Follow the demo in demo_image_psnr_ssim.py
