@@ -1,5 +1,3 @@
-from utils.calc_image_psnr_ssim import *
-
 '''
 
 Demo to calculate images' PSNR/SSIM
@@ -8,7 +6,7 @@ root_list: Dictionary
     each item should given two key-values:
         output: the dir of output images
         gt: the dir of gt images
-        
+
 batch_calc_image_PSNR_SSIM(): Function
     required params:
         root_list
@@ -17,6 +15,8 @@ batch_calc_image_PSNR_SSIM(): Function
         test_ycbcr: default=False, if True, applying Ycbcr color space
 
 '''
+
+from utils.calc_image_psnr_ssim import *
 
 root_list = [
     {

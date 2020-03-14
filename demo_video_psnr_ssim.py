@@ -1,5 +1,3 @@
-from utils.calc_video_psnr_ssim import *
-
 '''
 
 Demo to calculate videos' PSNR/SSIM
@@ -8,7 +6,7 @@ root_list: Dictionary
     each item should given two key-values:
         output: the dir of output videos
         gt: the dir of gt videos
-        
+
 save_csv_log_root: String
     thr dir of output log
 
@@ -23,6 +21,8 @@ batch_calc_video_PSNR_SSIM_toCSV(): Function
         match_byname: default=False, if True, matching output video and gt video by filename
 
 '''
+
+from utils.calc_video_psnr_ssim import *
 
 root_list = [
     {

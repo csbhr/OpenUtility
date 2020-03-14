@@ -1,8 +1,14 @@
 # Python_Tools
+There are some useful tools for low-level vision tasks.
 
 ## Current released function:
 
-1. Calculate images' PSNR/SSIM
-   - follow the demo in demo_image_psnr_ssim.py
-2. Calculate videos' PSNR/SSIM
-   - follow the demo in demo_video_psnr_ssim.py
+##### Calculate the PSNR/SSIM of images
+  - Follow the demo in demo_image_psnr_ssim.py
+   
+##### Calculate the PSNR/SSIM of videos
+  - Follow the demo in demo_video_psnr_ssim.py
+   
+##### Calculate the properties of model
+  - We use Swall0w's tools [torchstat](https://github.com/Swall0w/torchstat)
+  - Follow the demo in demo_flops_params.py
