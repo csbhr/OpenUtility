@@ -1,4 +1,7 @@
 # Python_Tools
+[![LICENSE](https://img.shields.io/badge/license-MIT-green)](https://github.com/csbhr/Python_Tools/blob/master/LICENSE)
+[![Python](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/)
+
 There are some useful tools for low-level vision tasks.
 
 - [Calculate images' PSNR/SSIM](#chapter-1)
@@ -6,7 +9,6 @@ There are some useful tools for low-level vision tasks.
 - [Calculate the properties of model](#chapter-3)
 - [Crop and combine images](#chapter-4)
 
----
 
 <a name="chapter-1"></a>
 ### Calculate images' PSNR/SSIM
