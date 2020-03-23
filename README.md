@@ -4,6 +4,7 @@ There are some useful tools for low-level vision tasks.
 - [Calculate the PSNR/SSIM of images](#chapter-1)
 - [Calculate the PSNR/SSIM of videos](#chapter-2)
 - [Calculate the properties of model](#chapter-3)
+- [Crop and combine images with padding](#chapter-4)
 
 ---
 
@@ -24,3 +25,7 @@ There are some useful tools for low-level vision tasks.
     python setup.py install
 ```
 - Follow the demo in demo_flops_params.py
+   
+<a name="chapter-4"></a>
+### Crop and combine images with padding
+- Follow the demo in demo_image_crop_combine.py
