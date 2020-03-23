@@ -23,10 +23,11 @@ There are some useful tools for low-level vision tasks.
 ## User Guide
 Here are some simple demos. If you want to learn more about the usage of these tools, you can refer to the optional parameters of functions in the source file.
 
+
 <a name="chapter-1"></a>
 ### Calculate images' PSNR/SSIM
 - You can calculate the PSNR/SSIM of the images in batches by following the demo:
-```
+```python
 from utils.calc_image_psnr_ssim import batch_calc_image_PSNR_SSIM
 root_list = [
     {
