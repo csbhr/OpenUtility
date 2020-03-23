@@ -173,6 +173,18 @@ def calc_video_PSNR_SSIM_byName(ouput_root, gt_root, crop_border=4, test_ycbcr=F
 
 def batch_calc_video_PSNR_SSIM_toCSV(root_list, save_csv_root, crop_border=4, test_ycbcr=False,
                                      combine_save=False, match_byname=False):
+    '''
+    required params:
+        root_list: a list, each item should be a dictionary that given two key-values:
+            output: the dir of output videos
+            gt: the dir of gt videos
+        save_csv_log_root: thr dir of output log
+    optional params:
+        crop_border: defalut=4, crop pixels when calculating PSNR/SSIM
+        test_ycbcr: default=False, if True, applying Ycbcr color space
+        combine_save: default=False, if True, combining all output log to one csv file
+        match_byname: default=False, if True, matching output video and gt video by filename
+    '''
     total_csv_log = []
     for i, root in enumerate(root_list):
         ouput_root = root['output']
@@ -185,7 +197,7 @@ def batch_calc_video_PSNR_SSIM_toCSV(root_list, save_csv_root, crop_border=4, te
         else:
             csv_log = calc_video_PSNR_SSIM(ouput_root, gt_root, crop_border=crop_border, test_ycbcr=test_ycbcr)
 
-        # 将每个测试的路径的PSNR/SSIM写到单独的csv文件中
+        # output the PSNR/SSIM log of each evaluated dir to a single csv file
         csv_log['row_names'] = [os.path.basename(p) for p in csv_log['row_names']]
         write_csv(file_path=os.path.join(save_csv_root, "{}_{}.csv".format(i, csv_log['row_names'][0])),
                   data=csv_log['psnr_ssim'],
@@ -193,7 +205,7 @@ def batch_calc_video_PSNR_SSIM_toCSV(root_list, save_csv_root, crop_border=4, te
                   col_names=csv_log['col_names'])
         total_csv_log.append(csv_log)
 
-    # 把所有PSNR/SSIM输出到一个csv文件
+    # output all PSNR/SSIM log to a csv file
     if combine_save and len(total_csv_log) > 0:
         com_csv_log = {
             'col_names': total_csv_log[0]['col_names'],

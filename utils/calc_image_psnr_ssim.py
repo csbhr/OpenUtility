@@ -59,6 +59,19 @@ def calc_image_PSNR_SSIM(ouput_root, gt_root, crop_border=4, test_ycbcr=False):
 
 
 def batch_calc_image_PSNR_SSIM(root_list, crop_border=4, test_ycbcr=False):
+    '''
+    required params:
+        root_list: a list, each item should be a dictionary that given two key-values:
+            output: the dir of output images
+            gt: the dir of gt images
+    optional params:
+        crop_border: defalut=4, crop pixels when calculating PSNR/SSIM
+        test_ycbcr: default=False, if True, applying Ycbcr color space
+    return:
+        log_list: a list, each item is a dictionary that given two key-values:
+            data_path: the evaluated dir
+            log: the log of this dir
+    '''
     log_list = []
     for i, root in enumerate(root_list):
         ouput_root = root['output']

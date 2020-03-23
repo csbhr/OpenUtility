@@ -20,7 +20,7 @@ def handle_dir(dir):
         print('mkdir:', dir)
 
 
-def crop_img(img, min_size=(100, 100), padding=10):
+def crop_img_with_padding(img, min_size=(100, 100), padding=10):
     h, w, c = img.shape
     n_x, n_y = h // min_size[0], w // min_size[1]
 
@@ -71,12 +71,53 @@ def combine_img(croped_imgs, padding=10):
     return combined_img
 
 
-def batch_crop_img(ori_root, dest_root, min_size=(100, 100), padding=10):
+def traverse_crop_img(img, dsize=(100, 100), interval=10):
+    h, w, c = img.shape
+
+    croped_imgs = []
+    for i in range(9999):
+        isbreak_x = False
+        ix = i * interval
+        xl, xr = ix, ix + dsize[0]
+        if xr > h:
+            xl, xr = h - dsize[0], h
+            isbreak_x = True
+        for j in range(9999):
+            isbreak_y = False
+            iy = j * interval
+            yl, yr = iy, iy + dsize[1]
+            if yr > w:
+                yl, yr = w - dsize[1], w
+                isbreak_y = True
+            croped = img[xl:xr, yl:yr, :]
+            croped_imgs.append(croped)
+            if isbreak_y:
+                break
+        if isbreak_x:
+            break
+
+    return croped_imgs
+
+
+def batch_crop_img_with_padding(ori_root, dest_root, min_size=(100, 100), padding=10):
+    '''
+    function:
+        cropping image to many patches with padding
+        it can be used for inferring large image
+    params:
+        ori_root: the dir of images that need to be processed
+        dest_root: the dir to save processed images
+        min_size: a tuple (h, w) the min size of crop, the border patch will be larger
+        padding: the padding size of each patch
+    notice:
+        filenames should not contain the character "-"
+        the crop flag "x-x-x-x" will be at the end of filename when cropping
+    '''
     handle_dir(dest_root)
     images_fname = sorted(os.listdir(ori_root))
     for imf in images_fname:
         img = cv2.imread(os.path.join(ori_root, imf))
-        img_cropped = crop_img(img, min_size=min_size, padding=padding)
+        img_cropped = crop_img_with_padding(img, min_size=min_size, padding=padding)
         for k in img_cropped.keys():
             cv2.imwrite(os.path.join(dest_root, "{}_{}.png".format(os.path.basename(imf).split('.')[0], k)),
                         img_cropped[k])
@@ -84,6 +125,18 @@ def batch_crop_img(ori_root, dest_root, min_size=(100, 100), padding=10):
 
 
 def batch_combine_img(ori_root, dest_root, padding=10):
+    '''
+    function:
+        combining many patches to image
+        it can be used to combine patches to image, when you finish inferring large image with cropped patches
+    params:
+        ori_root: the dir of images that need to be processed
+        dest_root: the dir to save processed images
+        padding: the padding size of each patch
+    notice:
+        filenames should not contain the character "-" except for the crop flag
+        the crop flag "x-x-x-x" should be at the end of filename when combining
+    '''
     handle_dir(dest_root)
     images_fname = [fn[:-(len(fn.split('_')[-1]) + 1)] for fn in os.listdir(ori_root)]
     images_fname = list(set(images_fname))
@@ -97,3 +150,23 @@ def batch_combine_img(ori_root, dest_root, padding=10):
         img_combined = combine_img(croped_imgs, padding=padding)
         cv2.imwrite(os.path.join(dest_root, "{}.png".format(imf)), img_combined)
         print("{}.png".format(imf), "combine done !")
+
+
+def batch_traverse_crop_img(ori_root, dest_root, dsize=(100, 100), interval=10):
+    '''
+    function:
+        traversing crop image to many patches with same interval
+    params:
+        ori_root: the dir of images that need to be processed
+        dest_root: the dir to save processed images
+        dsize: a tuple (h, w) the size of crop, the border patch will be overlapped for satisfing the dsize
+        interval: the interval when traversing
+    '''
+    handle_dir(dest_root)
+    images_fname = sorted(os.listdir(ori_root))
+    for imf in images_fname:
+        img = cv2.imread(os.path.join(ori_root, imf))
+        img_cropped = traverse_crop_img(img, dsize=dsize, interval=interval)
+        for i, cim in enumerate(img_cropped):
+            cv2.imwrite(os.path.join(dest_root, "{}_{}.png".format(os.path.basename(imf).split('.')[0], i)), cim)
+        print(imf, "crop done !")
