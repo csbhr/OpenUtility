@@ -49,7 +49,7 @@ for i, log in enumerate(log_list):
 <a name="chapter-2"></a>
 ### Calculate videos' PSNR/SSIM
 - You can calculate the PSNR/SSIM of the videos in batches by following the demo:
-```
+```python
 from utils.calc_video_psnr_ssim import batch_calc_video_PSNR_SSIM_toCSV
 root_list = [
     {
@@ -75,7 +75,7 @@ python setup.py install
 ```
 - The properties of model include: Params、Memory、MAdd、Flops、MemR+W
 - You can calculate properties of model by following the demo:
-```
+```python
 from torchstat import stat
 network = None  # Please define the model
 input_size = (3, 80, 80)  # the size of input (channel, height, width)
@@ -85,7 +85,7 @@ stat(network, input_size)
 <a name="chapter-4"></a>
 ### Crop and combine images
 - When you need to infer large image, you can crop image to many patches with padding by following the demo:
-```
+```python
 # Notice: 
 #   filenames should not contain the character "-"
 #   the crop flag "x-x-x-x" will be at the end of filename when cropping
@@ -94,7 +94,7 @@ dest_root = '/path/to/dest images'
 batch_crop_img_with_padding(ori_root, dest_root, min_size=(800, 800), padding=100)
 ```
 - When you finish inferring large image with cropped patches, you can combine patches to image by following the demo:
-```
+```python
 # Notice: 
 #   filenames should not contain the character "-" except for the crop flag
 #   the crop flag "x-x-x-x" should be at the end of filename when combining
@@ -103,7 +103,7 @@ dest_root = '/path/to/dest images'
 batch_combine_img(ori_root, dest_root, padding=100)
 ```
 - You can traversal crop image to many patches with same interval by following the demo:
-```
+```python
 ori_root = '/path/to/ori images'
 dest_root = '/path/to/dest images'
 batch_traverse_crop_img(ori_root, dest_root, dsize=(800, 800), interval=400)
@@ -112,12 +112,12 @@ batch_traverse_crop_img(ori_root, dest_root, dsize=(800, 800), interval=400)
 <a name="chapter-5"></a>
 ### Operate csv file
 - You can read a csv file by following the demo:
-```
+```python
 from utils import file_io_utils
 data, col_names, row_names = file_io_utils.read_csv('filename.csv', col_name_ind=0, row_name_ind=0)
 ```
 - You can write a numpy.array into a csv file by following the demo:
-```
+```python
 from utils import file_io_utils
 row_names = ['r1', 'r2', 'r3']
 col_names = ['c1', 'c2', 'c3', 'c4']
@@ -130,7 +130,7 @@ file_io_utils.write_csv('filename.csv', data_array, col_names, row_names)
 <a name="chapter-6"></a>
 ### Plot multiple curves in one figure
 - You plot multiple curves in one figure by following the demo:
-```
+```python
 import numpy as np
 from utils import visual_utils
 array_list = [
@@ -144,7 +144,7 @@ visual_utils.plot_multi_curve(array_list, label_list)
 <a name="chapter-7"></a>
 ### Visualize optical flow
 - You can visualize optical flow by following the demo:
-```
+```python
 from utils import visual_utils
 flow = None  # this is flow, shape=(h, w, 2)
 rgb_image = visual_utils.visual_flow(flow)
