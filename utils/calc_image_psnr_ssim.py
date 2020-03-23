@@ -1,6 +1,6 @@
 import os
 import cv2
-from utils import data_utils
+from utils import base_utils
 
 
 def calc_image_PSNR_SSIM(ouput_root, gt_root, crop_border=4, test_ycbcr=False):
@@ -28,8 +28,8 @@ def calc_image_PSNR_SSIM(ouput_root, gt_root, crop_border=4, test_ycbcr=False):
         im_GT = im_GT[:h, :w, :]  # crop GT to output size
 
         if test_ycbcr and im_GT.shape[2] == 3:  # evaluate on Y channel in YCbCr color space
-            im_GT = data_utils.bgr2ycbcr(im_GT)
-            im_Gen = data_utils.bgr2ycbcr(im_Gen)
+            im_GT = base_utils.bgr2ycbcr(im_GT)
+            im_Gen = base_utils.bgr2ycbcr(im_Gen)
 
         # crop borders
         if crop_border != 0:
@@ -45,8 +45,8 @@ def calc_image_PSNR_SSIM(ouput_root, gt_root, crop_border=4, test_ycbcr=False):
             cropped_GT = im_GT
             cropped_Gen = im_Gen
 
-        psnr = data_utils.PSNR_EDVR(cropped_GT * 255, cropped_Gen * 255)
-        ssim = data_utils.SSIM_EDVR(cropped_GT * 255, cropped_Gen * 255)
+        psnr = base_utils.PSNR_EDVR(cropped_GT * 255, cropped_Gen * 255)
+        ssim = base_utils.SSIM_EDVR(cropped_GT * 255, cropped_Gen * 255)
         PSNR_list.append(psnr)
         SSIM_list.append(ssim)
 

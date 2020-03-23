@@ -7,7 +7,7 @@ def visual_flow(flow):
     # 色调H：用角度度量，取值范围为0°～360°，从红色开始按逆时针方向计算，红色为0°，绿色为120°,蓝色为240°
     # 饱和度S：取值范围为0.0～1.0
     # 亮度V：取值范围为0.0(黑色)～1.0(白色)
-    # flow -> [h, w, 2]
+    # flow shape: [h, w, 2]
     h, w = flow.shape[:2]
     hsv = np.zeros((h, w, 3), np.uint8)
     mag, ang = cv2.cartToPolar(flow[..., 0], flow[..., 1])
@@ -22,18 +22,19 @@ def visual_flow(flow):
 
 def plot_multi_curve(array_list, label_list, title='compare', xlabel='Epochs', ylabel=None, save=None):
     '''
-    plot multi curve in one figure
-    :param array_list: the data of curve
-        list, item: numpy.array, ndim=1, the data of curve 1
-    :param label_list: list, labels
-    :param title: the title
-    :param xlabel: xlabel
-    :param ylabel:
-        if None: ylabel=title
-        else: ylabel
-    :param save:
-        if None: just show figure
-        else: save figure to 'save' path
+    function:
+        plot multi curve in one figure
+    required params:
+        array_list: the data of curves, a list
+            each item should be numpy.array, ndim=1
+        label_list: list, labels for each curve
+    optional params:
+        title: the title of figure
+        xlabel: the flag of x-axis
+        ylabel: the flag of y-axis, if None: ylabel=title
+        save:
+            if None: just show figure
+            else: the path to save figure, the figure will be saved
     '''
     assert len(array_list) == len(label_list), "length not equal"
 

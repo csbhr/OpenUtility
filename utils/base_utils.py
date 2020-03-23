@@ -6,59 +6,6 @@ from torch.autograd import Variable
 import cv2
 
 
-def calc_grad_sobel(img, device='cuda'):
-    if not isinstance(img, torch.Tensor):
-        raise Exception("Now just support torch.Tensor. See the Type(img)={}".format(type(img)))
-    if not img.ndimension() == 4:
-        raise Exception("Tensor ndimension must equal to 4. See the img.ndimension={}".format(img.ndimension()))
-
-    img = torch.mean(img, dim=1, keepdim=True)
-
-    # img = calc_meanFilter(img, device=device)  # meanFilter
-
-    sobel_filter_X = np.array([[1, 0, -1], [2, 0, -2], [1, 0, -1]]).reshape((1, 1, 3, 3))
-    sobel_filter_Y = np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]]).reshape((1, 1, 3, 3))
-    sobel_filter_X = torch.from_numpy(sobel_filter_X).float().to(device)
-    sobel_filter_Y = torch.from_numpy(sobel_filter_Y).float().to(device)
-    grad_X = F.conv2d(img, sobel_filter_X, bias=None, stride=1, padding=1)
-    grad_Y = F.conv2d(img, sobel_filter_Y, bias=None, stride=1, padding=1)
-    grad = torch.sqrt(grad_X.pow(2) + grad_Y.pow(2))
-
-    return grad_X, grad_Y, grad
-
-
-def calc_meanFilter(img, kernel_size=11, n_channel=1, device='cuda'):
-    mean_filter_X = np.ones(shape=(1, 1, kernel_size, kernel_size), dtype=np.float32) / (kernel_size * kernel_size)
-    mean_filter_X = torch.from_numpy(mean_filter_X).float().to(device)
-    new_img = torch.zeros_like(img)
-    for i in range(n_channel):
-        new_img[:, i:i + 1, :, :] = F.conv2d(img[:, i:i + 1, :, :], mean_filter_X, bias=None,
-                                             stride=1, padding=kernel_size // 2)
-    return new_img
-
-
-def warp_by_flow(x, flo, device='cuda'):
-    B, C, H, W = flo.size()
-
-    # mesh grid
-    xx = torch.arange(0, W).view(1, -1).repeat(H, 1)
-    yy = torch.arange(0, H).view(-1, 1).repeat(1, W)
-    xx = xx.view(1, 1, H, W).repeat(B, 1, 1, 1)
-    yy = yy.view(1, 1, H, W).repeat(B, 1, 1, 1)
-    grid = torch.cat((xx, yy), 1).float()
-    grid = grid.to(device)
-    vgrid = Variable(grid) + flo
-
-    # scale grid to [-1,1]
-    vgrid[:, 0, :, :] = 2.0 * vgrid[:, 0, :, :].clone() / max(W - 1, 1) - 1.0
-    vgrid[:, 1, :, :] = 2.0 * vgrid[:, 1, :, :].clone() / max(H - 1, 1) - 1.0
-
-    vgrid = vgrid.permute(0, 2, 3, 1)
-    output = F.grid_sample(x, vgrid, padding_mode='border')
-
-    return output
-
-
 #################################################################################
 ####                         EDVR Image PSNR SSIM                            ####
 #################################################################################
@@ -142,3 +89,61 @@ def SSIM_EDVR(img1, img2):
             return ssim(np.squeeze(img1), np.squeeze(img2))
     else:
         raise ValueError('Wrong input image dimensions.')
+
+
+#################################################################################
+####                                Others                                   ####
+#################################################################################
+
+
+def calc_grad_sobel(img, device='cuda'):
+    if not isinstance(img, torch.Tensor):
+        raise Exception("Now just support torch.Tensor. See the Type(img)={}".format(type(img)))
+    if not img.ndimension() == 4:
+        raise Exception("Tensor ndimension must equal to 4. See the img.ndimension={}".format(img.ndimension()))
+
+    img = torch.mean(img, dim=1, keepdim=True)
+
+    # img = calc_meanFilter(img, device=device)  # meanFilter
+
+    sobel_filter_X = np.array([[1, 0, -1], [2, 0, -2], [1, 0, -1]]).reshape((1, 1, 3, 3))
+    sobel_filter_Y = np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]]).reshape((1, 1, 3, 3))
+    sobel_filter_X = torch.from_numpy(sobel_filter_X).float().to(device)
+    sobel_filter_Y = torch.from_numpy(sobel_filter_Y).float().to(device)
+    grad_X = F.conv2d(img, sobel_filter_X, bias=None, stride=1, padding=1)
+    grad_Y = F.conv2d(img, sobel_filter_Y, bias=None, stride=1, padding=1)
+    grad = torch.sqrt(grad_X.pow(2) + grad_Y.pow(2))
+
+    return grad_X, grad_Y, grad
+
+
+def calc_meanFilter(img, kernel_size=11, n_channel=1, device='cuda'):
+    mean_filter_X = np.ones(shape=(1, 1, kernel_size, kernel_size), dtype=np.float32) / (kernel_size * kernel_size)
+    mean_filter_X = torch.from_numpy(mean_filter_X).float().to(device)
+    new_img = torch.zeros_like(img)
+    for i in range(n_channel):
+        new_img[:, i:i + 1, :, :] = F.conv2d(img[:, i:i + 1, :, :], mean_filter_X, bias=None,
+                                             stride=1, padding=kernel_size // 2)
+    return new_img
+
+
+def warp_by_flow(x, flo, device='cuda'):
+    B, C, H, W = flo.size()
+
+    # mesh grid
+    xx = torch.arange(0, W).view(1, -1).repeat(H, 1)
+    yy = torch.arange(0, H).view(-1, 1).repeat(1, W)
+    xx = xx.view(1, 1, H, W).repeat(B, 1, 1, 1)
+    yy = yy.view(1, 1, H, W).repeat(B, 1, 1, 1)
+    grid = torch.cat((xx, yy), 1).float()
+    grid = grid.to(device)
+    vgrid = Variable(grid) + flo
+
+    # scale grid to [-1,1]
+    vgrid[:, 0, :, :] = 2.0 * vgrid[:, 0, :, :].clone() / max(W - 1, 1) - 1.0
+    vgrid[:, 1, :, :] = 2.0 * vgrid[:, 1, :, :].clone() / max(H - 1, 1) - 1.0
+
+    vgrid = vgrid.permute(0, 2, 3, 1)
+    output = F.grid_sample(x, vgrid, padding_mode='border')
+
+    return output
