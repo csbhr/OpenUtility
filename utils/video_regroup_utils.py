@@ -3,12 +3,7 @@ import os
 import glob
 import torch
 import scipy.io as scio
-
-
-def handle_dir(dir):
-    if not os.path.exists(dir):
-        os.mkdir(dir)
-        print('mkdir:', dir)
+from utils.base_utils import handle_dir
 
 
 def VideoType2TypeVideo(ori_root, dest_root, ori_type, dest_type=''):

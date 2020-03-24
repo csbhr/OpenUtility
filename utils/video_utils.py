@@ -1,10 +1,25 @@
 import os
+from utils.base_utils import handle_dir
+from utils.image_utils import batch_resize_images
 
 
-def handle_dir(dir):
-    if not os.path.exists(dir):
-        os.mkdir(dir)
-        print('mkdir:', dir)
+def batch_resize_videos(ori_root, dest_root, scale=1.0, postfix=True):
+    '''
+    function:
+        resizing videos in batches
+    params:
+        ori_root: the dir of videos that need to be processed
+        dest_root: the dir to save processed videos
+        scale: float, the resize scale
+        postfix: if True: add scale as postfix for filename after resizing
+    '''
+    handle_dir(dest_root)
+    videos = os.listdir(ori_root)
+    for v in videos:
+        ori_v = os.path.join(ori_root, v)
+        dest_v = os.path.join(dest_root, v)
+        batch_resize_images(ori_v, dest_v, scale=scale, postfix=postfix)
+        print("video", v, "resize done !")
 
 
 def ext_frames_from_videos(ori_root, save_root, fname_template='%4d.png', start_idx=0, end_idx=99999):

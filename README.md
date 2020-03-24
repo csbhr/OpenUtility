@@ -8,9 +8,11 @@ There are some useful tools for low-level vision tasks.
 - [Calculate videos' PSNR/SSIM](#chapter-2)
 - [Calculate the properties of model](#chapter-3)
 - [Crop and combine images](#chapter-4)
-- [Operate csv file](#chapter-5)
-- [Plot multiple curves in one figure](#chapter-6)
-- [Visualize optical flow](#chapter-7)
+- [Select valid patches by gradient](#chapter-5)
+- [Resize images/videos](#chapter-6)
+- [Operate csv file](#chapter-7)
+- [Plot multiple curves in one figure](#chapter-8)
+- [Visualize optical flow](#chapter-9)
 
 
 ## Dependencies
@@ -89,6 +91,7 @@ stat(network, input_size)
 # Notice: 
 #   filenames should not contain the character "-"
 #   the crop flag "x-x-x-x" will be at the end of filename when cropping
+from utils.image_crop_combine import *
 ori_root = '/path/to/ori images'
 dest_root = '/path/to/dest images'
 batch_crop_img_with_padding(ori_root, dest_root, min_size=(800, 800), padding=100)
@@ -98,18 +101,47 @@ batch_crop_img_with_padding(ori_root, dest_root, min_size=(800, 800), padding=10
 # Notice: 
 #   filenames should not contain the character "-" except for the crop flag
 #   the crop flag "x-x-x-x" should be at the end of filename when combining
+from utils.image_crop_combine import *
 ori_root = '/path/to/ori images'
 dest_root = '/path/to/dest images'
 batch_combine_img(ori_root, dest_root, padding=100)
 ```
 - You can traversal crop image to many patches with same interval by following the demo:
 ```python
+from utils.image_crop_combine import *
 ori_root = '/path/to/ori images'
 dest_root = '/path/to/dest images'
 batch_traverse_crop_img(ori_root, dest_root, dsize=(800, 800), interval=400)
 ```
 
 <a name="chapter-5"></a>
+### Select valid patches by gradient
+- You can select valid patch that are not too smooth by following the demo:
+```python
+from utils.image_crop_combine import *
+ori_root = '/path/to/ori images'
+dest_root = '/path/to/dest images'
+batch_select_valid_patch(ori_root, dest_root)
+```
+
+<a name="chapter-6"></a>
+### Resize images/videos
+- You can resize images in batches by following the demo:
+```python
+from utils.image_utils import batch_resize_images
+ori_root = '/path/to/ori images'
+dest_root = '/path/to/dest images'
+batch_resize_images(ori_root, dest_root, scale=2.0)
+```
+- You can resize videos in batches by following the demo:
+```python
+from utils.video_utils import batch_resize_videos
+ori_root = '/path/to/ori videos'
+dest_root = '/path/to/dest videos'
+batch_resize_videos(ori_root, dest_root, scale=2.0)
+```
+
+<a name="chapter-7"></a>
 ### Operate csv file
 - You can read a csv file by following the demo:
 ```python
@@ -127,7 +159,7 @@ data_array = np.array([[1, 2, 3, 4],
 file_io_utils.write_csv('filename.csv', data_array, col_names, row_names)
 ```
 
-<a name="chapter-6"></a>
+<a name="chapter-8"></a>
 ### Plot multiple curves in one figure
 - You plot multiple curves in one figure by following the demo:
 ```python
@@ -141,7 +173,7 @@ label_list = ['curve-1', 'curve-2']
 visual_utils.plot_multi_curve(array_list, label_list)
 ```
 
-<a name="chapter-7"></a>
+<a name="chapter-9"></a>
 ### Visualize optical flow
 - You can visualize optical flow by following the demo:
 ```python

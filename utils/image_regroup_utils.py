@@ -1,12 +1,7 @@
 import shutil
 import os
 import glob
-
-
-def handle_dir(dir):
-    if not os.path.exists(dir):
-        os.mkdir(dir)
-        print('mkdir:', dir)
+from utils.base_utils import handle_dir
 
 
 def extra_imgs_by_postfix(ori_root, dest_root, ori_postfix='', new_postfix='', ext='*'):

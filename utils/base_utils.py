@@ -4,6 +4,7 @@ import numpy as np
 import math
 from torch.autograd import Variable
 import cv2
+import os
 
 
 #################################################################################
@@ -92,8 +93,33 @@ def SSIM_EDVR(img1, img2):
 
 
 #################################################################################
+####                          operate system                                 ####
+#################################################################################
+
+def handle_dir(dir):
+    if not os.path.exists(dir):
+        os.mkdir(dir)
+        print('mkdir:', dir)
+
+def get_fname_ext(fname):
+    fname = os.path.basename(fname)
+    ext = fname.split(".")[-1]
+    fname = fname[:-(len(ext)+1)]
+    return fname, ext
+
+
+#################################################################################
 ####                                Others                                   ####
 #################################################################################
+
+def evaluate_smooth(img):
+    x = cv2.Sobel(img, cv2.CV_16S, 1, 0)
+    y = cv2.Sobel(img, cv2.CV_16S, 0, 1)
+    absX = cv2.convertScaleAbs(x)
+    absY = cv2.convertScaleAbs(y)
+    dst = cv2.addWeighted(absX, 0.5, absY, 0.5, 0)
+    smooth = np.mean(dst)
+    return smooth
 
 
 def calc_grad_sobel(img, device='cuda'):

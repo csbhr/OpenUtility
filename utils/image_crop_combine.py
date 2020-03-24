@@ -12,12 +12,7 @@ import cv2
 import os
 import glob
 import numpy as np
-
-
-def handle_dir(dir):
-    if not os.path.exists(dir):
-        os.mkdir(dir)
-        print('mkdir:', dir)
+from utils.base_utils import handle_dir, evaluate_smooth
 
 
 def crop_img_with_padding(img, min_size=(100, 100), padding=10):
@@ -170,3 +165,27 @@ def batch_traverse_crop_img(ori_root, dest_root, dsize=(100, 100), interval=10):
         for i, cim in enumerate(img_cropped):
             cv2.imwrite(os.path.join(dest_root, "{}_{}.png".format(os.path.basename(imf).split('.')[0], i)), cim)
         print(imf, "crop done !")
+
+
+def batch_select_valid_patch(ori_root, dest_root, thre=7):
+    '''
+    function:
+        selecting valid patch that are not too smooth
+    params:
+        ori_root: the dir of patches that need to be selected
+        dest_root: the dir to save selected patch
+        thre: the threshold value of smooth
+    '''
+    handle_dir(dest_root)
+    images_fname = sorted(os.listdir(ori_root))
+    total_num = len(images_fname)
+    valid_num = 0
+    for imf in images_fname:
+        img = cv2.imread(os.path.join(ori_root, imf))
+        smooth = evaluate_smooth(img)
+        if smooth > thre:
+            cv2.imwrite(os.path.join(dest_root, imf), img)
+            valid_num += 1
+        else:
+            print(imf, "too smooth, smooth={}".format(smooth))
+    print("Total {} patches, valid {}, remove {}".format(total_num, valid_num, total_num - valid_num))
