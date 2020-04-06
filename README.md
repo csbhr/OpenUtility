@@ -6,7 +6,7 @@ There are some useful tools for low-level vision tasks.
 
 - [Calculate images' PSNR/SSIM](#chapter-1)
 - [Calculate videos' PSNR/SSIM](#chapter-2)
-- [Calculate the properties of model](#chapter-3)
+- [Calculate the properties of model: Params, Flops, etc.](#chapter-3)
 - [Crop and combine images](#chapter-4)
 - [Select valid patches by gradient](#chapter-5)
 - [Resize images/videos](#chapter-6)
@@ -68,7 +68,7 @@ batch_calc_video_PSNR_SSIM_toCSV(root_list, save_csv_log_root)
 ```
    
 <a name="chapter-3"></a>
-### Calculate the properties of model
+### Calculate the properties of model: Params, Flops, etc.
 - We use Swall0w's tools [torchstat](https://github.com/Swall0w/torchstat)
 - You should run the commands to install torchstat:
 ```

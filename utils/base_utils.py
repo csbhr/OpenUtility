@@ -101,16 +101,18 @@ def handle_dir(dir):
         os.mkdir(dir)
         print('mkdir:', dir)
 
+
 def get_fname_ext(fname):
     fname = os.path.basename(fname)
     ext = fname.split(".")[-1]
-    fname = fname[:-(len(ext)+1)]
+    fname = fname[:-(len(ext) + 1)]
     return fname, ext
 
 
 #################################################################################
 ####                                Others                                   ####
 #################################################################################
+
 
 def evaluate_smooth(img):
     x = cv2.Sobel(img, cv2.CV_16S, 1, 0)
