@@ -1,12 +1,13 @@
 import os
 import cv2
-from utils import base_utils
+from base import image_base
+from base.os_base import listdir
 
 
-def calc_image_PSNR_SSIM(ouput_root, gt_root, crop_border=4, test_ycbcr=False):
+def calc_image_PSNR_SSIM(output_root, gt_root, crop_border=4, test_ycbcr=False):
     '''
     计算图片的 PSNR、SSIM，使用 EDVR 的计算方式
-    要求 ouput_root, gt_root 中的文件按顺序一一对应
+    要求 output_root, gt_root 中的文件按顺序一一对应
     '''
 
     if test_ycbcr:
@@ -16,10 +17,10 @@ def calc_image_PSNR_SSIM(ouput_root, gt_root, crop_border=4, test_ycbcr=False):
 
     PSNR_list = []
     SSIM_list = []
-    output_img_list = sorted(os.listdir(ouput_root))
-    gt_img_list = sorted(os.listdir(gt_root))
+    output_img_list = sorted(listdir(output_root))
+    gt_img_list = sorted(listdir(gt_root))
     for o_im, g_im in zip(output_img_list, gt_img_list):
-        o_im_path = os.path.join(ouput_root, o_im)
+        o_im_path = os.path.join(output_root, o_im)
         g_im_path = os.path.join(gt_root, g_im)
         im_GT = cv2.imread(g_im_path) / 255.
         im_Gen = cv2.imread(o_im_path) / 255.
@@ -28,8 +29,8 @@ def calc_image_PSNR_SSIM(ouput_root, gt_root, crop_border=4, test_ycbcr=False):
         im_GT = im_GT[:h, :w, :]  # crop GT to output size
 
         if test_ycbcr and im_GT.shape[2] == 3:  # evaluate on Y channel in YCbCr color space
-            im_GT = base_utils.bgr2ycbcr(im_GT)
-            im_Gen = base_utils.bgr2ycbcr(im_Gen)
+            im_GT = image_base.bgr2ycbcr(im_GT, range=1.)
+            im_Gen = image_base.bgr2ycbcr(im_Gen, range=1.)
 
         # crop borders
         if crop_border != 0:
@@ -45,8 +46,8 @@ def calc_image_PSNR_SSIM(ouput_root, gt_root, crop_border=4, test_ycbcr=False):
             cropped_GT = im_GT
             cropped_Gen = im_Gen
 
-        psnr = base_utils.PSNR_EDVR(cropped_GT * 255, cropped_Gen * 255)
-        ssim = base_utils.SSIM_EDVR(cropped_GT * 255, cropped_Gen * 255)
+        psnr = image_base.PSNR(cropped_GT * 255, cropped_Gen * 255)
+        ssim = image_base.SSIM(cropped_GT * 255, cropped_Gen * 255)
         PSNR_list.append(psnr)
         SSIM_list.append(ssim)
 
@@ -76,12 +77,19 @@ def batch_calc_image_PSNR_SSIM(root_list, crop_border=4, test_ycbcr=False):
     for i, root in enumerate(root_list):
         ouput_root = root['output']
         gt_root = root['gt']
-        print(">>>>  now test >>>>")
-        print(">>>>  output: {}".format(ouput_root))
-        print(">>>>  gt: {}".format(gt_root))
+        print(">>>>  Now Evaluation >>>>")
+        print(">>>>  OUTPUT: {}".format(ouput_root))
+        print(">>>>  GT: {}".format(gt_root))
         _, _, log = calc_image_PSNR_SSIM(ouput_root, gt_root, crop_border=crop_border, test_ycbcr=test_ycbcr)
         log_list.append({
             'data_path': ouput_root,
             'log': log
         })
+
+    print("--------------------------------------------------------------------------------------")
+    for i, log in enumerate(log_list):
+        print("## The {}-th:".format(i))
+        print(">> ", log['data_path'])
+        print(">> ", log['log'])
+
     return log_list

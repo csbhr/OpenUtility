@@ -4,41 +4,90 @@ import numpy as np
 import math
 from torch.autograd import Variable
 import cv2
-import os
 
 
 #################################################################################
-####                         EDVR Image PSNR SSIM                            ####
+####                            Image Operation                              ####
 #################################################################################
+def matlab_imresize(img, scalar_scale=None, method='bicubic', output_shape=None):
+    pass
 
 
-def bgr2ycbcr(img, only_y=True):
-    '''same as matlab rgb2ycbcr
+def rgb2ycbcr(img, range=255., only_y=True):
+    """same as matlab rgb2ycbcr, please use bgr2ycbcr when using cv2.imread
+    img: shape=[h, w, 3]
+    range: the data range
     only_y: only return Y channel
-    Input:
-        uint8, [0, 255]
-        float, [0, 1]
-    '''
+    """
     in_img_type = img.dtype
     img.astype(np.float32)
-    if in_img_type != np.uint8:
-        img *= 255.
+    range_scale = 255. / range
+    img *= range_scale
+
+    # convert
+    if only_y:
+        rlt = np.dot(img, [65.481, 128.553, 24.966]) / 255.0 + 16.0
+    else:
+        rlt = np.matmul(img, [[65.481, -37.797, 112.0], [128.553, -74.203, -93.786],
+                              [24.966, 112.0, -18.214]]) / 255.0 + [16, 128, 128]
+
+    rlt /= range_scale
+    if in_img_type == np.uint8:
+        rlt = rlt.round()
+    return rlt.astype(in_img_type)
+
+
+def bgr2ycbcr(img, range=255., only_y=True):
+    """bgr version of rgb2ycbcr, for cv2.imread
+    img: shape=[h, w, 3]
+    range: the data range
+    only_y: only return Y channel
+    """
+    in_img_type = img.dtype
+    img.astype(np.float32)
+    range_scale = 255. / range
+    img *= range_scale
+
     # convert
     if only_y:
         rlt = np.dot(img, [24.966, 128.553, 65.481]) / 255.0 + 16.0
     else:
         rlt = np.matmul(img, [[24.966, 112.0, -18.214], [128.553, -74.203, -93.786],
                               [65.481, -37.797, 112.0]]) / 255.0 + [16, 128, 128]
+
+    rlt /= range_scale
     if in_img_type == np.uint8:
         rlt = rlt.round()
-    else:
-        rlt /= 255.
     return rlt.astype(in_img_type)
 
 
-def PSNR_EDVR(img1, img2):
+def ycbcr2rgb(img, range=255.):
+    """same as matlab ycbcr2rgb
+    img: shape=[h, w, 3]
+    range: the data range
+    """
+    in_img_type = img.dtype
+    img.astype(np.float32)
+    range_scale = 255. / range
+    img *= range_scale
+
+    # convert
+    rlt = np.matmul(img, [[0.00456621, 0.00456621, 0.00456621], [0, -0.00153632, 0.00791071],
+                          [0.00625893, -0.00318811, 0]]) * 255.0 + [-222.921, 135.576, -276.836]
+
+    rlt /= range_scale
+    if in_img_type == np.uint8:
+        rlt = rlt.round()
+    return rlt.astype(in_img_type)
+
+
+#################################################################################
+####                            Image PSNR SSIM                              ####
+#################################################################################
+
+def PSNR(img1, img2):
     '''
-    img1 and img2 have range [0, 255]
+    img1, img2: [0, 255]
     '''
     img1 = img1.astype(np.float64)
     img2 = img2.astype(np.float64)
@@ -48,7 +97,7 @@ def PSNR_EDVR(img1, img2):
     return 20 * math.log10(255.0 / math.sqrt(mse))
 
 
-def SSIM_EDVR(img1, img2):
+def SSIM(img1, img2):
     '''calculate SSIM
     the same outputs as MATLAB's
     img1, img2: [0, 255]
@@ -90,23 +139,6 @@ def SSIM_EDVR(img1, img2):
             return ssim(np.squeeze(img1), np.squeeze(img2))
     else:
         raise ValueError('Wrong input image dimensions.')
-
-
-#################################################################################
-####                          operate system                                 ####
-#################################################################################
-
-def handle_dir(dir):
-    if not os.path.exists(dir):
-        os.mkdir(dir)
-        print('mkdir:', dir)
-
-
-def get_fname_ext(fname):
-    fname = os.path.basename(fname)
-    ext = fname.split(".")[-1]
-    fname = fname[:-(len(ext) + 1)]
-    return fname, ext
 
 
 #################################################################################

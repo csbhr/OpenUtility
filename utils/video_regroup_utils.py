@@ -1,192 +1,153 @@
-import shutil
 import os
-import glob
-import torch
-import scipy.io as scio
-from utils.base_utils import handle_dir
+from base.os_base import handle_dir, copy_file, move_file, listdir, glob_match
+from utils import file_regroup_utils
 
 
-def VideoType2TypeVideo(ori_root, dest_root, ori_type, dest_type=''):
+def VideoFlag2FlagVideo(ori_root, dest_root, ori_flag, dest_flag=None):
     '''
-    videos/blur/frames.png  -->  blur/videos/frames.png
+    videos/type/frames  -->  type/videos/frames
+    params:
+        ori_root: the dir of files that need to be processed
+        dest_root: the dir for saving matched files
+        ori_flag: the ori video flag(e.g. blur)
+        dest_flag: the flag(e.g. blur) for saving videos
+            default: None, that is keeping the ori flag
     '''
-    if dest_type == '':
-        dest_type = ori_type
+    if dest_flag is None:
+        dest_flag = ori_flag
     handle_dir(dest_root)
-    handle_dir(os.path.join(dest_root, dest_type))
-    video_list = os.listdir(ori_root)
+    handle_dir(os.path.join(dest_root, dest_flag))
+    video_list = listdir(ori_root)
     for v in video_list:
-        image_list = os.listdir(os.path.join(ori_root, v, ori_type))
-        handle_dir(os.path.join(dest_root, dest_type, v))
+        image_list = listdir(os.path.join(ori_root, v, ori_flag))
+        handle_dir(os.path.join(dest_root, dest_flag, v))
         for im in image_list:
-            src = os.path.join(ori_root, v, ori_type, im)
-            dst = os.path.join(dest_root, dest_type, v, im)
-            shutil.copy(src, dst)
-            print('copy file from {} to {}'.format(src, dst))
+            src = os.path.join(ori_root, v, ori_flag, im)
+            dst = os.path.join(dest_root, dest_flag, v, im)
+            copy_file(src, dst)
 
 
-def TypeVideo2VideoType(ori_root, dest_root, ori_type, dest_type=''):
+def FlagVideo2VideoFlag(ori_root, dest_root, ori_flag, dest_flag=None):
     '''
-    blur/videos/frames.png  -->  videos/blur/frames.png
+    blur/videos/frames  -->  videos/blur/frames
+    params:
+        ori_root: the dir of files that need to be processed
+        dest_root: the dir for saving matched files
+        ori_flag: the ori video flag(e.g. blur)
+        dest_flag: the flag(e.g. blur) for saving videos
+            default: None, that is keeping the ori flag
     '''
-    if dest_type == '':
-        dest_type = ori_type
+    if dest_flag is None:
+        dest_flag = ori_flag
     handle_dir(dest_root)
-    video_list = os.listdir(os.path.join(ori_root, ori_type))
+    video_list = listdir(os.path.join(ori_root, ori_flag))
     for v in video_list:
-        image_list = os.listdir(os.path.join(ori_root, ori_type, v))
+        image_list = listdir(os.path.join(ori_root, ori_flag, v))
         handle_dir(os.path.join(dest_root, v))
-        handle_dir(os.path.join(dest_root, v, dest_type))
+        handle_dir(os.path.join(dest_root, v, dest_flag))
         for im in image_list:
-            src = os.path.join(ori_root, ori_type, v, im)
-            dst = os.path.join(dest_root, v, dest_type, im)
-            shutil.copy(src, dst)
-            print('copy file from {} to {}'.format(src, dst))
+            src = os.path.join(ori_root, ori_flag, v, im)
+            dst = os.path.join(dest_root, v, dest_flag, im)
+            copy_file(src, dst)
 
 
-def extra_frames_from_videos(ori_root, dest_root, ori_postfix='', new_postfix='', ext='png'):
+def remove_frames_prefix(root, prefix=''):
     '''
-    从 ori_root 抽取后缀为 ori_postfix 的图片，
-    修改后缀为 new_postfix 复制到 dest_root
+    remove prefix from frames
+    params:
+        root: the dir of videos that need to be processed
+        prefix: the prefix to be removed
     '''
-    if new_postfix == '':
-        new_postfix = ori_postfix
+    video_list = listdir(root)
+    for v in video_list:
+        file_regroup_utils.remove_files_prefix(os.path.join(root, v), prefix=prefix)
+
+
+def remove_frames_postfix(root, postfix=''):
+    '''
+    remove postfix from frames
+    params:
+        root: the dir of videos that need to be processed
+        postfix: the postfix to be removed
+    '''
+    video_list = listdir(root)
+    for v in video_list:
+        file_regroup_utils.remove_files_postfix(os.path.join(root, v), postfix=postfix)
+
+
+def add_frames_postfix(root, postfix=''):
+    '''
+    add postfix to frames
+    params:
+        root: the dir of videos that need to be processed
+        postfix: the postfix to be added
+    '''
+    video_list = listdir(root)
+    for v in video_list:
+        file_regroup_utils.add_files_postfix(os.path.join(root, v), postfix=postfix)
+
+
+def extra_frames_by_postfix(ori_root, dest_root, match_postfix='', new_postfix=None, match_ext='*'):
+    '''
+    extra frames from ori_root to dest_root by match_postfix and match_ext
+    params:
+        ori_root: the dir of videos that need to be processed
+        dest_root: the dir for saving matched files
+        match_postfix: the postfix to be matched
+        new_postfix: the postfix for matched files
+            default: None, that is keeping the ori postfix
+        match_ext: the ext to be matched
+    '''
+    if new_postfix is None:
+        new_postfix = match_postfix
+
     handle_dir(dest_root)
-    video_list = os.listdir(ori_root)
+    video_list = listdir(ori_root)
     for v in video_list:
-        handle_dir(os.path.join(dest_root, v))
-        flag_img_list = glob.glob(os.path.join(ori_root, v, "*_{}.{}".format(ori_postfix, ext)))
-        for im in flag_img_list:
-            video_ind = os.path.basename(im).split('_')[0]
-            basename = '{}_{}.{}'.format(video_ind, new_postfix, ext)
-            src = im
-            dst = os.path.join(dest_root, v, basename)
-            shutil.copy(src, dst)
-            print('copy file from {} to {}'.format(src, dst))
+        file_regroup_utils.extra_files_by_postfix(
+            ori_root=os.path.join(ori_root, v),
+            dest_root=os.path.join(dest_root, v),
+            match_postfix=match_postfix,
+            new_postfix=new_postfix,
+            match_ext=match_ext
+        )
 
 
-def remove_frame_prefix(root, prefix=''):
+def resort_frames_index(root, template='{:0>4}', start_idx=0):
     '''
-    删除文件名的前缀
+    resort frames' filename using template that index start from start_idx
+    params:
+        root: the dir of files that need to be processed
+        template: the template for processed filename
+        start_idx: the start index
     '''
-    video_list = os.listdir(root)
+    video_list = listdir(root)
     for v in video_list:
-        img_list = glob.glob(os.path.join(root, v, "*"))
-        for im in img_list:
-            basename = os.path.basename(im)
-            now_prefix = basename[:len(prefix)]
-            if now_prefix == prefix:
-                dest_basename = basename[len(prefix):]
-                src = im
-                dst = os.path.join(root, v, dest_basename)
-                os.rename(src, dst)
-                print('rename file from {} to {}'.format(src, dst))
+        file_regroup_utils.resort_files_index(os.path.join(root, v), template=template, start_idx=start_idx)
 
 
-def remove_frame_postfix(root, postfix=''):
+def remove_head_tail_frames(root, recycle_bin=None, num=0):
     '''
-    删除文件名的后缀
+    remove num hean&tail frames from videos
+    params:
+        root: the dir of files that need to be processed
+        recycle_bin: the removed frames will be put here
+            defalut: None, that is putting the removed frames in root/_recycle_bin
+        num: the number of frames to be removed
     '''
-    video_list = os.listdir(root)
-    for v in video_list:
-        img_list = glob.glob(os.path.join(root, v, "*"))
-        for im in img_list:
-            basename = os.path.basename(im)
-            ext = basename.split('.')[-1]
-            fname = basename[:-(len(ext) + 1)]
-            now_postfix = fname[-len(postfix):]
-            if now_postfix == postfix:
-                dest_basename = "{}.{}".format(fname[:-len(postfix)], ext)
-                src = im
-                dst = os.path.join(root, v, dest_basename)
-                os.rename(src, dst)
-                print('rename file from {} to {}'.format(src, dst))
-
-
-def add_frame_postfix(root, postfix=''):
-    '''
-    添加文件名的后缀
-    '''
-    video_list = os.listdir(root)
-    for v in video_list:
-        img_list = glob.glob(os.path.join(root, v, "*"))
-        for im in img_list:
-            basename = os.path.basename(im)
-            filename = basename.split(".")[0]
-            ext = basename.split(".")[-1]
-            dest_basename = "{}_{}.{}".format(filename, postfix, ext)
-            src = im
-            dst = os.path.join(root, v, dest_basename)
-            os.rename(src, dst)
-            print('rename file from {} to {}'.format(src, dst))
-
-
-def resort_frame_index(root, template='{:0>4}', start_list=None):
-    '''
-    重新排序并命名，以 template 为模板，以 start_list 的序号开始编号
-    start_list:
-        default: [0]
-        如果 start_list 的长度与视频个数不一致，则所有视频都按 start_list[0] 开始编号
-    '''
-    template = template + '.{}'
-    video_list = sorted(os.listdir(root))
-    if not start_list:
-        start_list = [0]
-    if not len(start_list) == len(video_list):
-        start_list = [start_list[0] for _ in range(len(video_list))]
-    for start, v in zip(start_list, video_list):
-        img_list = sorted(glob.glob(os.path.join(root, v, "*")))
-        for i, im in enumerate(img_list):
-            basename = os.path.basename(im)
-            ext = basename.split(".")[-1]
-            dest_basename = template.format(i + start, ext)
-            src = im
-            dst = os.path.join(root, v, dest_basename)
-            os.rename(src, dst)
-            print('rename file from {} to {}'.format(src, dst))
-
-
-def remove_pre_tail_frames(root, recycle_bin='', num=1):
-    '''
-    删除各个视频的前后 num 帧
-    删除的帧会复制到 recycle_bin 中
-    '''
-    video_list = os.listdir(root)
-    if recycle_bin == '':
+    if recycle_bin is None:
         recycle_bin = os.path.join(root, '_recycle_bin')
     handle_dir(recycle_bin)
+
+    video_list = listdir(root)
     for v in video_list:
-        img_list = sorted(glob.glob(os.path.join(root, v, "*")))
+        img_list = sorted(glob_match(os.path.join(root, v, "*")))
         handle_dir(os.path.join(recycle_bin, v))
         for i in range(num):
             src = img_list[i]
             dest = os.path.join(recycle_bin, v, os.path.basename(src))
-            shutil.move(src, dest)
-            print('remove file from {}'.format(src))
+            move_file(src, dest)
+
             src = img_list[-(i + 1)]
             dest = os.path.join(recycle_bin, v, os.path.basename(src))
-            shutil.move(src, dest)
-            print('remove file from {}'.format(src))
-
-
-def save_flow_pt2mat(ori_root, dest_root):
-    '''
-    把 ori_root 中的 flow 从 pt 文件转换为 mat 文件后保存到 dest_root
-    '''
-    handle_dir(dest_root)
-    video_list = os.listdir(ori_root)
-    for v in video_list:
-        handle_dir(os.path.join(dest_root, v))
-        file_list = glob.glob(os.path.join(ori_root, v, "*.pt"))
-        for pt_path in file_list:
-            filename = os.path.basename(pt_path)
-            ext = filename.split('.')[-1]
-            basename = filename[:-(len(ext) + 1)]
-            mat_path = os.path.join(dest_root, v, "{}.mat".format(basename))
-            try:
-                flow = torch.load(pt_path)[0].permute(1, 2, 0).cpu().numpy()
-                flow_dict = {'flow': flow}
-                scio.savemat(mat_path, flow_dict)
-                print('save {} to {}'.format(pt_path, mat_path))
-            except:
-                print('skip file {}'.format(pt_path))
+            move_file(src, dest)
