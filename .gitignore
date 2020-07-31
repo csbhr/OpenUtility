@@ -1,5 +1,6 @@
 .idea/
 */__pycache__
 ss*
+draft*
 temp/
 .DS_Store*
