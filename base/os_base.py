@@ -13,7 +13,8 @@ def listdir(path):
     sys_files = ['.DS_Store']
     files = os.listdir(path)
     for sf in sys_files:
-        files.remove(sf)
+        if sf in files:
+            files.remove(sf)
     return files
 
 

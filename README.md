@@ -70,7 +70,7 @@ ori_root = '/path/to/ori images'
 dest_root = '/path/to/dest images'
 batch_cv2_resize_images(ori_root, dest_root, scale=2.0)
 ```
-- You can resize videos in batches by following the demo:
+- You can resize videos using cv2 in batches by following the demo:
 ```python
 from utils.video_utils import batch_cv2_resize_videos
 ori_root = '/path/to/ori videos'
