@@ -131,8 +131,8 @@ from utils.dnn_utils import cal_parmeters
 network = None  # Please define the model
 cal_parmeters(network)
 ```
-- You can also calculate more properties of model, including Params、Memory、MAdd、Flops、MemR+W
-- We use Swall0w's tools [Swall0w/torchstat](https://github.com/Swall0w/torchstat)
+- You can also calculate more properties of model: Params, Memory, MAdd, Flops, etc.
+- We use Swall0w's tools [Swall0w/torchstat](https://github.com/Swall0w/torchstat).
 - You should first run the commands to install torchstat:
 ```shell script
 cd ./torchstat
