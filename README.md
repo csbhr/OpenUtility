@@ -125,25 +125,25 @@ batch_select_valid_patch(ori_root, dest_root)
    
 <a name="chapter-model-properties"></a>
 ### Calculate the properties of deep model: Params, Flops, etc.
-- We use Swall0w's tools [torchstat](https://github.com/Swall0w/torchstat)
-- You should run the commands to install torchstat:
+- You can only calculate model Params by following the demo:
+```python
+from utils.dnn_utils import cal_parmeters
+network = None  # Please define the model
+cal_parmeters(network)
 ```
+- You can also calculate more properties of model include: Params、Memory、MAdd、Flops、MemR+W
+- We use Swall0w's tools [torchstat](https://github.com/Swall0w/torchstat)
+- You should first run the commands to install torchstat:
+```shell script
 cd ./torchstat
 python setup.py install
 ```
-- The properties of model include: Params、Memory、MAdd、Flops、MemR+W
-- You can calculate properties of model by following the demo:
+- And then you can calculate properties by following the demo:
 ```python
 from torchstat import stat
 network = None  # Please define the model
 input_size = (3, 80, 80)  # the size of input (channel, height, width)
 stat(network, input_size)
-```
-- You can also only calculate model Params by following the demo:
-```python
-from utils.dnn_utils import cal_parmeters
-network = None  # Please define the model
-cal_parmeters(network)
 ```
 
 <a name="chapter-csv"></a>
