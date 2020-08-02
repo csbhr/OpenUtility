@@ -58,7 +58,7 @@ batch_calc_video_PSNR_SSIM(root_list)
 
 <a name="chapter-resize"></a>
 ### Resize images/videos
-- We use [fatheral](https://github.com/fatheral/matlab_imresize) python implementation of matLab imresize() function.
+- We use fatheral's python implementation of matLab imresize() function [fatheral/matlab_imresize](https://github.com/fatheral/matlab_imresize).
 - You can resize images/videos in batches that is same as matlab2017 imresize by following the demo:
 ```python
 from utils.image_utils import batch_matlab_resize_images
@@ -131,8 +131,8 @@ from utils.dnn_utils import cal_parmeters
 network = None  # Please define the model
 cal_parmeters(network)
 ```
-- You can also calculate more properties of model include: Params、Memory、MAdd、Flops、MemR+W
-- We use Swall0w's tools [torchstat](https://github.com/Swall0w/torchstat)
+- You can also calculate more properties of model, including Params、Memory、MAdd、Flops、MemR+W
+- We use Swall0w's tools [Swall0w/torchstat](https://github.com/Swall0w/torchstat)
 - You should first run the commands to install torchstat:
 ```shell script
 cd ./torchstat
