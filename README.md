@@ -77,7 +77,7 @@ ori_root = '/path/to/ori videos'
 dest_root = '/path/to/dest videos'
 batch_matlab_resize_videos(ori_root, dest_root, scale=2.0)
 ```
-- You alse can resize images/videos using cv2 in batches by following the demo:
+- You can also resize images/videos using cv2 in batches by following the demo:
 ```python
 from utils.image_utils import batch_cv2_resize_images
 ori_root = '/path/to/ori images'
@@ -143,6 +143,12 @@ from torchstat import stat
 network = None  # Please define the model
 input_size = (3, 80, 80)  # the size of input (channel, height, width)
 stat(network, input_size)
+```
+- You can also only calculate model Params by following the demo:
+```python
+from utils.dnn_utils import cal_parmeters
+network = None  # Please define the model
+cal_parmeters(network)
 ```
 
 <a name="chapter-6"></a>
