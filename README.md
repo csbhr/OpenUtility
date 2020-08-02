@@ -4,14 +4,13 @@
 
 There are some useful tools for low-level vision tasks.
 
-- [Calculate images' PSNR/SSIM](#chapter-1)
-- [Calculate videos' PSNR/SSIM](#chapter-2)
-- [Resize images/videos](#chapter-3)
-- [Crop, combine and traverse images](#chapter-4)
-- [Calculate the properties of deep model: Params, Flops, etc.](#chapter-5)
-- [Operate csv file](#chapter-6)
-- [Plot multiple curves in one figure](#chapter-7)
-- [Visualize optical flow](#chapter-8)
+- [Calculate PSNR/SSIM](#chapter-psnr-ssim)
+- [Resize images/videos](#chapter-resize)
+- [Crop, combine and traverse images](#chapter-crop-combine-traverse)
+- [Calculate the properties of deep model: Params, Flops, etc.](#chapter-model-properties)
+- [Operate csv file](#chapter-csv)
+- [Plot multiple curves in one figure](#chapter-plot-multi-curve)
+- [Visualize optical flow](#chapter-flow-visual)
 
 
 ## Dependencies
@@ -25,9 +24,9 @@ There are some useful tools for low-level vision tasks.
 Here are some simple demos. If you want to learn more about the usage of these tools, you can refer to the optional parameters of functions in the source file.
 
 
-<a name="chapter-1"></a>
-### Calculate images' PSNR/SSIM
-- You can calculate the PSNR/SSIM of the images in batches by following the demo:
+<a name="chapter-psnr-ssim"></a>
+### Calculate PSNR/SSIM
+- You can calculate the PSNR/SSIM of the images/videos in batches by following the demo:
 ```python
 from utils.image_metric_utils import batch_calc_image_PSNR_SSIM
 root_list = [
@@ -42,10 +41,6 @@ root_list = [
 ]
 batch_calc_image_PSNR_SSIM(root_list)
 ```
-
-<a name="chapter-2"></a>
-### Calculate videos' PSNR/SSIM
-- You can calculate the PSNR/SSIM of the videos in batches by following the demo:
 ```python
 from utils.video_metric_utils import batch_calc_video_PSNR_SSIM
 root_list = [
@@ -61,7 +56,7 @@ root_list = [
 batch_calc_video_PSNR_SSIM(root_list)
 ```
 
-<a name="chapter-3"></a>
+<a name="chapter-resize"></a>
 ### Resize images/videos
 - We use [fatheral](https://github.com/fatheral/matlab_imresize) python implementation of matLab imresize() function.
 - You can resize images/videos in batches that is same as matlab2017 imresize by following the demo:
@@ -91,7 +86,7 @@ dest_root = '/path/to/dest videos'
 batch_cv2_resize_videos(ori_root, dest_root, scale=2.0)
 ```
    
-<a name="chapter-4"></a>
+<a name="chapter-crop-combine-traverse"></a>
 ### Crop and combine images
 - When you need to infer large image, you can crop image to many patches with padding by following the demo:
 ```python
@@ -128,7 +123,7 @@ dest_root = '/path/to/dest images'
 batch_select_valid_patch(ori_root, dest_root)
 ```
    
-<a name="chapter-5"></a>
+<a name="chapter-model-properties"></a>
 ### Calculate the properties of deep model: Params, Flops, etc.
 - We use Swall0w's tools [torchstat](https://github.com/Swall0w/torchstat)
 - You should run the commands to install torchstat:
@@ -151,7 +146,7 @@ network = None  # Please define the model
 cal_parmeters(network)
 ```
 
-<a name="chapter-6"></a>
+<a name="chapter-csv"></a>
 ### Operate csv file
 - You can read a csv file by following the demo:
 ```python
@@ -170,7 +165,7 @@ data_array = np.array([[1, 2, 3, 4],
 file_io_base.write_csv('filename.csv', data_array, col_names, row_names)
 ```
 
-<a name="chapter-7"></a>
+<a name="chapter-plot-multi-curve"></a>
 ### Plot multiple curves in one figure
 - You plot multiple curves in one figure by following the demo:
 ```python
@@ -184,7 +179,7 @@ label_list = ['curve-1', 'curve-2']
 plot_utils.plot_multi_curve(array_list, label_list)
 ```
 
-<a name="chapter-8"></a>
+<a name="chapter-flow-visual"></a>
 ### Visualize optical flow
 - You can visualize optical flow by following the demo:
 ```python
