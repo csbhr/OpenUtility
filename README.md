@@ -63,14 +63,27 @@ batch_calc_video_PSNR_SSIM(root_list)
 
 <a name="chapter-3"></a>
 ### Resize images/videos
-- You can resize images using cv2 in batches by following the demo:
+- We use [fatheral](https://github.com/fatheral/matlab_imresize) python implementation of matLab imresize() function.
+- You can resize images/videos in batches that is same as matlab2017 imresize by following the demo:
+```python
+from utils.image_utils import batch_matlab_resize_images
+ori_root = '/path/to/ori images'
+dest_root = '/path/to/dest images'
+batch_matlab_resize_images(ori_root, dest_root, scale=2.0)
+```
+```python
+from utils.video_utils import batch_matlab_resize_videos
+ori_root = '/path/to/ori videos'
+dest_root = '/path/to/dest videos'
+batch_matlab_resize_videos(ori_root, dest_root, scale=2.0)
+```
+- You alse can resize images/videos using cv2 in batches by following the demo:
 ```python
 from utils.image_utils import batch_cv2_resize_images
 ori_root = '/path/to/ori images'
 dest_root = '/path/to/dest images'
 batch_cv2_resize_images(ori_root, dest_root, scale=2.0)
 ```
-- You can resize videos using cv2 in batches by following the demo:
 ```python
 from utils.video_utils import batch_cv2_resize_videos
 ori_root = '/path/to/ori videos'

@@ -4,13 +4,30 @@ import numpy as np
 import math
 from torch.autograd import Variable
 import cv2
+from base.matlab_imresize import imresize
 
 
 #################################################################################
 ####                            Image Operation                              ####
 #################################################################################
-def matlab_imresize(img, scalar_scale=None, method='bicubic', output_shape=None):
-    pass
+def matlab_imresize(img, scalar_scale=None, output_shape=None, method='bicubic'):
+    '''same as matlab2017 imresize
+    img: shape=[h, w, c]
+    scalar_scale: the resize scale
+        if None, using output_shape
+    output_shape: the resize shape, (h, w)
+        if scalar_scale=None, using this param
+    method: the interpolation method
+        optional: 'bicubic', 'bilinear'
+        default: 'bicubic'
+    '''
+    return imresize(
+        I=img,
+        scalar_scale=scalar_scale,
+        output_shape=output_shape,
+        method=method
+    )
+
 
 
 def rgb2ycbcr(img, range=255., only_y=True):

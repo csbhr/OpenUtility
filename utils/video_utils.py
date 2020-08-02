@@ -1,6 +1,32 @@
 import os
 from base.os_base import handle_dir, copy_file, listdir
-from utils.image_utils import batch_cv2_resize_images
+from utils.image_utils import batch_cv2_resize_images, batch_matlab_resize_images
+
+
+def batch_matlab_resize_videos(ori_root, dest_root, scale=1.0, method='bicubic', filename_template="{}.png"):
+    '''
+    function:
+        resizing videos in batches, same as matlab2017 imresize
+    params:
+        ori_root: string, the dir of videos that need to be processed
+        dest_root: string, the dir to save processed videos
+        scale: float, the resize scale
+        method: string, the interpolation method,
+            optional: 'bilinear', 'bicubic'
+            default: 'bicubic'
+        filename_template: string, the filename template for saving images
+    '''
+    handle_dir(dest_root)
+    videos = listdir(ori_root)
+    for v in videos:
+        batch_matlab_resize_images(
+            ori_root=os.path.join(ori_root, v),
+            dest_root=os.path.join(dest_root, v),
+            scale=scale,
+            method=method,
+            filename_template=filename_template
+        )
+        print("Video", v, "resize done !")
 
 
 def batch_cv2_resize_videos(ori_root, dest_root, scale=1.0, method='bicubic', filename_template="{}.png"):

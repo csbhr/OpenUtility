@@ -2,6 +2,33 @@ import os
 import cv2
 import numpy as np
 from base.os_base import handle_dir, get_fname_ext, listdir
+from base.image_base import matlab_imresize
+
+
+def batch_matlab_resize_images(ori_root, dest_root, scale=1.0, method='bicubic', filename_template="{}.png"):
+    '''
+    function:
+        resizing images in batches, same as matlab2017 imresize
+    params:
+        ori_root: string, the dir of images that need to be processed
+        dest_root: string, the dir to save processed images
+        scale: float, the resize scale
+        method: string, the interpolation method,
+            optional: 'bilinear', 'bicubic'
+            default: 'bicubic'
+        filename_template: string, the filename template for saving images
+    '''
+    if method != 'bilinear' and method != 'bicubic':
+        raise Exception('Unknown method!')
+
+    handle_dir(dest_root)
+    scale = float(scale)
+    images_fname = sorted(listdir(ori_root))
+    for imf in images_fname:
+        img = cv2.imread(os.path.join(ori_root, imf)).astype('float32')
+        img = matlab_imresize(img, scalar_scale=scale, method=method)
+        cv2.imwrite(os.path.join(dest_root, filename_template.format(get_fname_ext(imf)[0])), img)
+        print("Image", imf, "resize done !")
 
 
 def batch_cv2_resize_images(ori_root, dest_root, scale=1.0, method='bicubic', filename_template="{}.png"):
