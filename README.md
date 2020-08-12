@@ -4,7 +4,7 @@
 
 There are some useful tools for low-level vision tasks.
 
-- [Calculate PSNR/SSIM](#chapter-psnr-ssim)
+- [Calculate metrics: PSNR, SSIM, LPIPS](#chapter-metrics)
 - [Resize images/videos](#chapter-resize)
 - [Crop, combine and traverse images](#chapter-crop-combine-traverse)
 - [Calculate the properties of deep model: Params, Flops, etc.](#chapter-model-properties)
@@ -24,8 +24,8 @@ There are some useful tools for low-level vision tasks.
 Here are some simple demos. If you want to learn more about the usage of these tools, you can refer to the optional parameters of functions in the source file.
 
 
-<a name="chapter-psnr-ssim"></a>
-### Calculate PSNR/SSIM
+<a name="chapter-metrics"></a>
+### Calculate metrics: PSNR, SSIM, LPIPS
 - You can calculate the PSNR/SSIM of the images/videos in batches by following the demo:
 ```python
 from utils.image_metric_utils import batch_calc_image_PSNR_SSIM
@@ -54,6 +54,35 @@ root_list = [
     },
 ]
 batch_calc_video_PSNR_SSIM(root_list)
+```
+- You can calculate the LPIPS of the images/videos in batches by following the demo:
+```python
+from utils.image_metric_utils import batch_calc_image_LPIPS
+root_list = [
+    {
+        'output': '/path/to/output images 1',
+        'gt': '/path/to/gt images 1'
+    },
+    {
+        'output': '/path/to/output images 2',
+        'gt': '/path/to/gt images 2'
+    },
+]
+batch_calc_image_LPIPS(root_list)
+```
+```python
+from utils.video_metric_utils import batch_calc_video_LPIPS
+root_list = [
+    {
+        'output': '/path/to/output videos 1',
+        'gt': '/path/to/gt videos 1'
+    },
+    {
+        'output': '/path/to/output videos 2',
+        'gt': '/path/to/gt videos 2'
+    },
+]
+batch_calc_video_LPIPS(root_list)
 ```
 
 <a name="chapter-resize"></a>
@@ -135,7 +164,7 @@ cal_parmeters(network)
 - We use Swall0w's tools [Swall0w/torchstat](https://github.com/Swall0w/torchstat).
 - You should first run the commands to install torchstat:
 ```shell script
-cd ./torchstat
+cd ./utils/torchstat
 python setup.py install
 ```
 - And then you can calculate properties by following the demo:

@@ -1,7 +1,10 @@
 import os
 import cv2
+import torch
+import numpy as np
 from base import image_base
 from base.os_base import listdir
+import utils.PerceptualSimilarity.models as lpips_models
 
 
 def calc_image_PSNR_SSIM(output_root, gt_root, crop_border=4, test_ycbcr=False):
@@ -81,6 +84,87 @@ def batch_calc_image_PSNR_SSIM(root_list, crop_border=4, test_ycbcr=False):
         print(">>>>  OUTPUT: {}".format(ouput_root))
         print(">>>>  GT: {}".format(gt_root))
         _, _, log = calc_image_PSNR_SSIM(ouput_root, gt_root, crop_border=crop_border, test_ycbcr=test_ycbcr)
+        log_list.append({
+            'data_path': ouput_root,
+            'log': log
+        })
+
+    print("--------------------------------------------------------------------------------------")
+    for i, log in enumerate(log_list):
+        print("## The {}-th:".format(i))
+        print(">> ", log['data_path'])
+        print(">> ", log['log'])
+
+    return log_list
+
+
+def calc_image_LPIPS(output_root, gt_root, model=None, use_gpu=False, spatial=True):
+    '''
+    计算图片的 LPIPS
+    要求 output_root, gt_root 中的文件按顺序一一对应
+    '''
+
+    def _load_image(path, size=(512, 512)):
+        img = cv2.imread(path)
+        h, w, c = img.shape
+        if h != size[0] or w != size[1]:
+            img = cv2.resize(img, dsize=size, interpolation=cv2.INTER_CUBIC)
+        return img[:, :, ::-1]
+
+    def _im2tensor(image, imtype=np.uint8, cent=1., factor=255. / 2.):
+        return torch.Tensor((image / factor - cent)[:, :, :, np.newaxis].transpose((3, 2, 0, 1)))
+
+    if model is None:
+        model = lpips_models.PerceptualLoss(model='net-lin', net='alex', use_gpu=use_gpu, spatial=spatial)
+
+    LPIPS_list = []
+    output_img_list = sorted(listdir(output_root))
+    gt_img_list = sorted(listdir(gt_root))
+    for o_im, g_im in zip(output_img_list, gt_img_list):
+        o_im_path = os.path.join(output_root, o_im)
+        g_im_path = os.path.join(gt_root, g_im)
+        im_GT = _im2tensor(_load_image(g_im_path))
+        im_Gen = _im2tensor(_load_image(o_im_path))
+
+        if use_gpu:
+            im_GT = im_GT.cuda()
+            im_Gen = im_Gen.cuda()
+
+        lpips = model.forward(im_GT, im_Gen).mean()
+        LPIPS_list.append(lpips)
+
+        print("{} LPIPS={:.4}".format(o_im, lpips))
+
+    log = 'Average LPIPS={:.4}'.format(sum(LPIPS_list) / len(LPIPS_list))
+    print(log)
+
+    return LPIPS_list, log
+
+
+def batch_calc_image_LPIPS(root_list, use_gpu=False, spatial=True):
+    '''
+    required params:
+        root_list: a list, each item should be a dictionary that given two key-values:
+            output: the dir of output images
+            gt: the dir of gt images
+    optional params:
+        use_gpu: defalut=False, if True, using gpu
+        spatial: default=True, if True, return spatial map
+    return:
+        log_list: a list, each item is a dictionary that given two key-values:
+            data_path: the evaluated dir
+            log: the log of this dir
+    '''
+    model = lpips_models.PerceptualLoss(model='net-lin', net='alex', use_gpu=use_gpu, spatial=spatial)
+
+    log_list = []
+    for i, root in enumerate(root_list):
+        ouput_root = root['output']
+        gt_root = root['gt']
+        print(">>>>  Now Evaluation >>>>")
+        print(">>>>  OUTPUT: {}".format(ouput_root))
+        print(">>>>  GT: {}".format(gt_root))
+        _, log = calc_image_LPIPS(ouput_root, gt_root, model=model, use_gpu=use_gpu, spatial=spatial)
         log_list.append({
             'data_path': ouput_root,
             'log': log
