@@ -2,6 +2,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+def get_max(arr):
+    new_arr = np.zeros(arr.shape)
+    for i in range(arr.shape[0]):
+        new_arr[i] = np.max(arr[:i + 1])
+    return new_arr
+
+
+def get_min(arr):
+    new_arr = np.zeros(arr.shape)
+    for i in range(arr.shape[0]):
+        new_arr[i] = np.min(arr[:i + 1])
+    return new_arr
+
+
 def plot_curve(data, title, xlabel='Epochs', ylabel=None, save=None):
     '''
     function:
