@@ -67,7 +67,7 @@ def calc_kernel_gradient_similarity_video(output_root, gt_root):
             sum(v_lpips['gradient_similarity']) / len(v_lpips['gradient_similarity']))
         print(log)
         logs.append(log)
-    log = 'Average LPIPS={:.4}'.format(GS_sum / kernel_num)
+    log = 'Average Gradient-Similarity={:.4}'.format(GS_sum / kernel_num)
     print(log)
     logs.append(log)
 
