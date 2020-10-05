@@ -4,7 +4,7 @@
 
 There are some useful tools for low-level vision tasks.
 
-- [Calculate metrics: PSNR, SSIM, LPIPS](#chapter-metrics)
+- [Calculate metrics: PSNR, SSIM, LPIPS, Kernel Gradient Similarity](#chapter-metrics)
 - [Resize images/videos](#chapter-resize)
 - [Crop, combine and traverse images](#chapter-crop-combine-traverse)
 - [Calculate the properties of deep model: Params, Flops, etc.](#chapter-model-properties)
@@ -83,6 +83,21 @@ root_list = [
     },
 ]
 batch_calc_video_LPIPS(root_list)
+```
+- You can calculate the Gradient Similarity of the kernels in batches by following the demo:
+```python
+from utils.kernel_metric_utils import batch_calc_kernel_gradient_similarity
+root_list = [
+    {
+        'output': '/path/to/output kernel 1',
+        'gt': '/path/to/gt kernel 1'
+    },
+    {
+        'output': '/path/to/output kernel 2',
+        'gt': '/path/to/gt kernel 2'
+    },
+]
+batch_calc_kernel_gradient_similarity(root_list, video_type=False)
 ```
 
 <a name="chapter-resize"></a>

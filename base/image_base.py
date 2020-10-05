@@ -29,7 +29,6 @@ def matlab_imresize(img, scalar_scale=None, output_shape=None, method='bicubic')
     )
 
 
-
 def rgb2ycbcr(img, range=255., only_y=True):
     """same as matlab rgb2ycbcr, please use bgr2ycbcr when using cv2.imread
     img: shape=[h, w, 3]

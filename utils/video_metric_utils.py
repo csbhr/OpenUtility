@@ -1,11 +1,9 @@
 import os
-import cv2
 import numpy as np
-import torch
-from base import image_base
 from base.file_io_base import write_csv
 from base.os_base import listdir
 import utils.PerceptualSimilarity.models as lpips_models
+from utils.image_metric_utils import calc_image_PSNR_SSIM, calc_image_LPIPS
 
 
 def calc_video_PSNR_SSIM(output_root, gt_root, crop_border=4, test_ycbcr=False):
@@ -13,11 +11,6 @@ def calc_video_PSNR_SSIM(output_root, gt_root, crop_border=4, test_ycbcr=False):
     计算视频的 PSNR、SSIM，使用 EDVR 的计算方式
     要求 output_root, gt_root 中的文件按顺序一一对应
     '''
-
-    if test_ycbcr:
-        print('Testing Y channel.')
-    else:
-        print('Testing RGB channels.')
 
     PSNR_sum = 0.
     SSIM_sum = 0.
@@ -28,54 +21,23 @@ def calc_video_PSNR_SSIM(output_root, gt_root, crop_border=4, test_ycbcr=False):
 
     video_list = sorted(listdir(output_root))
     for v in video_list:
+        v_PSNR_list, v_SSIM_list, _ = calc_image_PSNR_SSIM(
+            output_root=os.path.join(output_root, v),
+            gt_root=os.path.join(gt_root, v),
+            crop_border=crop_border, test_ycbcr=test_ycbcr
+        )
+        PSNR_sum += sum(v_PSNR_list)
+        SSIM_sum += sum(v_SSIM_list)
+        img_num += len(v_PSNR_list)
 
         video_PSNR.append({
             'video_name': v,
-            'psnr': []
+            'psnr': v_PSNR_list
         })
         video_SSIM.append({
             'video_name': v,
-            'ssim': []
+            'ssim': v_SSIM_list
         })
-
-        output_img_list = sorted(listdir(os.path.join(output_root, v)))
-        gt_img_list = sorted(listdir(os.path.join(gt_root, v)))
-        for o_im, g_im in zip(output_img_list, gt_img_list):
-            o_im_path = os.path.join(output_root, v, o_im)
-            g_im_path = os.path.join(gt_root, v, g_im)
-            im_GT = cv2.imread(g_im_path) / 255.
-            im_Gen = cv2.imread(o_im_path) / 255.
-
-            h, w, c = im_Gen.shape  # TODO
-            im_GT = im_GT[:h, :w, :]  # TODO
-
-            if test_ycbcr and im_GT.shape[2] == 3:  # evaluate on Y channel in YCbCr color space
-                im_GT = image_base.bgr2ycbcr(im_GT, range=1.)
-                im_Gen = image_base.bgr2ycbcr(im_Gen, range=1.)
-
-            # crop borders
-            if crop_border != 0:
-                if im_GT.ndim == 3:
-                    cropped_GT = im_GT[crop_border:-crop_border, crop_border:-crop_border, :]
-                    cropped_Gen = im_Gen[crop_border:-crop_border, crop_border:-crop_border, :]
-                elif im_GT.ndim == 2:
-                    cropped_GT = im_GT[crop_border:-crop_border, crop_border:-crop_border]
-                    cropped_Gen = im_Gen[crop_border:-crop_border, crop_border:-crop_border]
-                else:
-                    raise ValueError('Wrong image dimension: {}. Should be 2 or 3.'.format(im_GT.ndim))
-            else:
-                cropped_GT = im_GT
-                cropped_Gen = im_Gen
-
-            psnr = image_base.PSNR(cropped_GT * 255, cropped_Gen * 255)
-            ssim = image_base.SSIM(cropped_GT * 255, cropped_Gen * 255)
-            PSNR_sum += psnr
-            SSIM_sum += ssim
-            img_num += 1
-            video_PSNR[-1]['psnr'].append(psnr)
-            video_SSIM[-1]['ssim'].append(ssim)
-
-            print("{}-{} PSNR={:.5}, SSIM={:.4}".format(v, o_im, psnr, ssim))
 
     logs = []
     PSNR_SSIM_csv_log = {
@@ -176,16 +138,6 @@ def calc_video_LPIPS(output_root, gt_root, model=None, use_gpu=False, spatial=Tr
     要求 output_root, gt_root 中的文件按顺序一一对应
     '''
 
-    def _load_image(path, size=(512, 512)):
-        img = cv2.imread(path)
-        h, w, c = img.shape
-        if h != size[0] or w != size[1]:
-            img = cv2.resize(img, dsize=size, interpolation=cv2.INTER_CUBIC)
-        return img[:, :, ::-1]
-
-    def _im2tensor(image, imtype=np.uint8, cent=1., factor=255. / 2.):
-        return torch.Tensor((image / factor - cent)[:, :, :, np.newaxis].transpose((3, 2, 0, 1)))
-
     if model is None:
         model = lpips_models.PerceptualLoss(model='net-lin', net='alex', use_gpu=use_gpu, spatial=spatial)
 
@@ -196,30 +148,18 @@ def calc_video_LPIPS(output_root, gt_root, model=None, use_gpu=False, spatial=Tr
 
     video_list = sorted(listdir(output_root))
     for v in video_list:
+        v_LPIPS_list, _ = calc_image_LPIPS(
+            output_root=os.path.join(output_root, v),
+            gt_root=os.path.join(gt_root, v),
+            model=model, use_gpu=use_gpu, spatial=spatial
+        )
+        LPIPS_sum += sum(v_LPIPS_list)
+        img_num += len(v_LPIPS_list)
 
         video_LPIPS.append({
             'video_name': v,
-            'lpips': []
+            'lpips': v_LPIPS_list
         })
-
-        output_img_list = sorted(listdir(os.path.join(output_root, v)))
-        gt_img_list = sorted(listdir(os.path.join(gt_root, v)))
-        for o_im, g_im in zip(output_img_list, gt_img_list):
-            o_im_path = os.path.join(output_root, v, o_im)
-            g_im_path = os.path.join(gt_root, v, g_im)
-            im_GT = _im2tensor(_load_image(g_im_path))
-            im_Gen = _im2tensor(_load_image(o_im_path))
-
-            if use_gpu:
-                im_GT = im_GT.cuda()
-                im_Gen = im_Gen.cuda()
-
-            lpips = model.forward(im_GT, im_Gen).mean()
-            LPIPS_sum += lpips
-            img_num += 1
-            video_LPIPS[-1]['lpips'].append(lpips)
-
-            print("{}-{} LPIPS={:.4}".format(v, o_im, lpips))
 
     logs = []
     LPIPS_csv_log = {
