@@ -46,6 +46,9 @@ def calc_video_PSNR_SSIM(output_root, gt_root, crop_border=4, test_ycbcr=False):
             im_GT = cv2.imread(g_im_path) / 255.
             im_Gen = cv2.imread(o_im_path) / 255.
 
+            h, w, c = im_Gen.shape  # TODO
+            im_GT = im_GT[:h, :w, :]  # TODO
+
             if test_ycbcr and im_GT.shape[2] == 3:  # evaluate on Y channel in YCbCr color space
                 im_GT = image_base.bgr2ycbcr(im_GT, range=1.)
                 im_Gen = image_base.bgr2ycbcr(im_Gen, range=1.)
