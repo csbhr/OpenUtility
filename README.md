@@ -25,7 +25,7 @@ Here are some simple demos. If you want to learn more about the usage of these t
 
 
 <a name="chapter-metrics"></a>
-### Calculate metrics: PSNR, SSIM, LPIPS
+### Calculate metrics: PSNR, SSIM, LPIPS, Kernel Gradient Similarity
 - You can calculate the PSNR/SSIM of the images/videos in batches by following the demo:
 ```python
 from utils.image_metric_utils import batch_calc_image_PSNR_SSIM
