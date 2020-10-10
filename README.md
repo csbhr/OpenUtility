@@ -114,7 +114,7 @@ batch_calc_kernel_gradient_similarity(root_list, video_type=False)
 <a name="chapter-image-video-processing"></a>
 ### 2. Image / Video Processing ( resize, crop, etc.)
 
-##### 2.1 Image/Video Resize same as matlab2017
+##### 2.1 Image/Video Resize
 - We use fatheral's python implementation of matLab imresize() function [fatheral/matlab_imresize](https://github.com/fatheral/matlab_imresize).
 - Following the demo for batch operation:
 ```python
@@ -130,7 +130,7 @@ ori_root = '/path/to/ori videos'
 dest_root = '/path/to/dest videos'
 batch_matlab_resize_videos(ori_root, dest_root, scale=2.0)
 ```
-- ***Image/Video Resize using opencv***
+- We also apply opencv for resizing.
 - Following the demo for batch operation:
 ```python
 from utils.image_utils import batch_cv2_resize_images
