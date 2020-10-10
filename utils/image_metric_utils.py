@@ -7,7 +7,7 @@ from base.os_base import listdir
 import utils.PerceptualSimilarity.models as lpips_models
 
 
-def calc_image_PSNR_SSIM(output_root, gt_root, crop_border=4, test_ycbcr=False):
+def calc_image_PSNR_SSIM(output_root, gt_root, crop_border=4, test_ycbcr=False, crop_GT=False):
     '''
     计算图片的 PSNR、SSIM，使用 EDVR 的计算方式
     要求 output_root, gt_root 中的文件按顺序一一对应
@@ -28,8 +28,9 @@ def calc_image_PSNR_SSIM(output_root, gt_root, crop_border=4, test_ycbcr=False):
         im_GT = cv2.imread(g_im_path) / 255.
         im_Gen = cv2.imread(o_im_path) / 255.
 
-        h, w, c = im_Gen.shape
-        im_GT = im_GT[:h, :w, :]  # crop GT to output size
+        if crop_GT:
+            h, w, c = im_Gen.shape
+            im_GT = im_GT[:h, :w, :]  # crop GT to output size
 
         if test_ycbcr and im_GT.shape[2] == 3:  # evaluate on Y channel in YCbCr color space
             im_GT = image_base.bgr2ycbcr(im_GT, range=1.)
@@ -62,7 +63,7 @@ def calc_image_PSNR_SSIM(output_root, gt_root, crop_border=4, test_ycbcr=False):
     return PSNR_list, SSIM_list, log
 
 
-def batch_calc_image_PSNR_SSIM(root_list, crop_border=4, test_ycbcr=False):
+def batch_calc_image_PSNR_SSIM(root_list, crop_border=4, test_ycbcr=False, crop_GT=False):
     '''
     required params:
         root_list: a list, each item should be a dictionary that given two key-values:
@@ -71,6 +72,7 @@ def batch_calc_image_PSNR_SSIM(root_list, crop_border=4, test_ycbcr=False):
     optional params:
         crop_border: defalut=4, crop pixels when calculating PSNR/SSIM
         test_ycbcr: default=False, if True, applying Ycbcr color space
+        crop_GT: default=False, if True, cropping GT to output size
     return:
         log_list: a list, each item is a dictionary that given two key-values:
             data_path: the evaluated dir
@@ -83,7 +85,8 @@ def batch_calc_image_PSNR_SSIM(root_list, crop_border=4, test_ycbcr=False):
         print(">>>>  Now Evaluation >>>>")
         print(">>>>  OUTPUT: {}".format(ouput_root))
         print(">>>>  GT: {}".format(gt_root))
-        _, _, log = calc_image_PSNR_SSIM(ouput_root, gt_root, crop_border=crop_border, test_ycbcr=test_ycbcr)
+        _, _, log = calc_image_PSNR_SSIM(ouput_root, gt_root,
+                                         crop_border=crop_border, test_ycbcr=test_ycbcr, crop_GT=crop_GT)
         log_list.append({
             'data_path': ouput_root,
             'log': log

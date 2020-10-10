@@ -6,7 +6,7 @@ import utils.PerceptualSimilarity.models as lpips_models
 from utils.image_metric_utils import calc_image_PSNR_SSIM, calc_image_LPIPS
 
 
-def calc_video_PSNR_SSIM(output_root, gt_root, crop_border=4, test_ycbcr=False):
+def calc_video_PSNR_SSIM(output_root, gt_root, crop_border=4, test_ycbcr=False, crop_GT=False):
     '''
     计算视频的 PSNR、SSIM，使用 EDVR 的计算方式
     要求 output_root, gt_root 中的文件按顺序一一对应
@@ -24,7 +24,7 @@ def calc_video_PSNR_SSIM(output_root, gt_root, crop_border=4, test_ycbcr=False):
         v_PSNR_list, v_SSIM_list, _ = calc_image_PSNR_SSIM(
             output_root=os.path.join(output_root, v),
             gt_root=os.path.join(gt_root, v),
-            crop_border=crop_border, test_ycbcr=test_ycbcr
+            crop_border=crop_border, test_ycbcr=test_ycbcr, crop_GT=crop_GT
         )
         PSNR_sum += sum(v_PSNR_list)
         SSIM_sum += sum(v_SSIM_list)
@@ -63,7 +63,7 @@ def calc_video_PSNR_SSIM(output_root, gt_root, crop_border=4, test_ycbcr=False):
     return PSNR_SSIM_csv_log, logs
 
 
-def batch_calc_video_PSNR_SSIM(root_list, crop_border=4, test_ycbcr=False,
+def batch_calc_video_PSNR_SSIM(root_list, crop_border=4, test_ycbcr=False, crop_GT=False,
                                save_log=False, save_log_root=None, combine_save=False):
     '''
     required params:
@@ -73,6 +73,7 @@ def batch_calc_video_PSNR_SSIM(root_list, crop_border=4, test_ycbcr=False,
     optional params:
         crop_border: defalut=4, crop pixels when calculating PSNR/SSIM
         test_ycbcr: default=False, if True, applying Ycbcr color space
+        crop_GT: default=False, if True, cropping GT to output size
         save_log: default=False, if True, saving csv log
         save_log_root: thr dir of output log
         combine_save: default=False, if True, combining all output log to one csv file
@@ -92,7 +93,8 @@ def batch_calc_video_PSNR_SSIM(root_list, crop_border=4, test_ycbcr=False,
         print(">>>>  Now Evaluation >>>>")
         print(">>>>  OUTPUT: {}".format(ouput_root))
         print(">>>>  GT: {}".format(gt_root))
-        csv_log, logs = calc_video_PSNR_SSIM(ouput_root, gt_root, crop_border=crop_border, test_ycbcr=test_ycbcr)
+        csv_log, logs = calc_video_PSNR_SSIM(ouput_root, gt_root,
+                                             crop_border=crop_border, test_ycbcr=test_ycbcr, crop_GT=crop_GT)
         log_list.append({
             'data_path': ouput_root,
             'log': logs

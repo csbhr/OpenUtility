@@ -4,30 +4,33 @@
 
 There are some useful tools for low-level vision tasks.
 
-- [Calculate metrics: PSNR, SSIM, LPIPS, Kernel Gradient Similarity](#chapter-metrics)
-- [Resize images/videos](#chapter-resize)
-- [Crop, combine and traverse images](#chapter-crop-combine-traverse)
-- [Calculate the properties of deep model: Params, Flops, etc.](#chapter-model-properties)
-- [Operate csv file](#chapter-csv)
-- [Plot multiple curves in one figure](#chapter-plot-multi-curve)
-- [Visualize optical flow](#chapter-flow-visual)
+- [Calculating Metrics ( PSNR, SSIM, etc.)](#chapter-calculating-metrics)
+- [Image / Video Processing ( resize, crop, etc.)](#chapter-image-video-processing)
+- [Deep Model Properties ( Params, Flops, etc. )](#chapter-model-properties)
+- [File Processing ( csv, etc. )](#chapter-file-processing)
+- [Visualize Tools ( plot, optical-flow, etc. )](#chapter-visualize-tools)
 
 
 ## Dependencies
 
+- Python 3 (Recommend to use [Anaconda](https://www.anaconda.com/download/#linux))
+- [PyTorch](https://pytorch.org/)
 - numpy: `conda install numpy`
 - matplotlib: `conda install matplotlib`
 - opencv: `conda install opencv`
 - pandas: `conda install pandas`
 
-## User Guide
-Here are some simple demos. If you want to learn more about the usage of these tools, you can refer to the optional parameters of functions in the source file.
+## Easy to use
+Here are some simple demos. If you want to learn more about the usage of these tools, you can refer to the source code for more optional parameters.
 
 
-<a name="chapter-metrics"></a>
-### Calculate metrics: PSNR, SSIM, LPIPS, Kernel Gradient Similarity
-- You can calculate the PSNR/SSIM of the images/videos in batches by following the demo:
+<a name="chapter-calculating-metrics"></a>
+### 1. Calculating Metrics ( PSNR, SSIM, etc.)
+
+##### 1.1 PSNR/SSIM
+- Following the demo for batch operation:
 ```python
+# Images
 from utils.image_metric_utils import batch_calc_image_PSNR_SSIM
 root_list = [
     {
@@ -40,8 +43,8 @@ root_list = [
     },
 ]
 batch_calc_image_PSNR_SSIM(root_list)
-```
-```python
+
+# Videos
 from utils.video_metric_utils import batch_calc_video_PSNR_SSIM
 root_list = [
     {
@@ -55,8 +58,11 @@ root_list = [
 ]
 batch_calc_video_PSNR_SSIM(root_list)
 ```
-- You can calculate the LPIPS of the images/videos in batches by following the demo:
+
+##### 1.2 LPIPS
+- Following the demo for batch operation:
 ```python
+# Images
 from utils.image_metric_utils import batch_calc_image_LPIPS
 root_list = [
     {
@@ -69,8 +75,8 @@ root_list = [
     },
 ]
 batch_calc_image_LPIPS(root_list)
-```
-```python
+
+# Videos
 from utils.video_metric_utils import batch_calc_video_LPIPS
 root_list = [
     {
@@ -84,8 +90,12 @@ root_list = [
 ]
 batch_calc_video_LPIPS(root_list)
 ```
-- You can calculate the Gradient Similarity of the kernels in batches by following the demo:
+
+##### 1.3 Kernel Gradient Similarity
+- Following the demo for batch operation:
 ```python
+# Images: video_type=False
+# Videos: video_type=True
 from utils.kernel_metric_utils import batch_calc_kernel_gradient_similarity
 root_list = [
     {
@@ -100,43 +110,48 @@ root_list = [
 batch_calc_kernel_gradient_similarity(root_list, video_type=False)
 ```
 
-<a name="chapter-resize"></a>
-### Resize images/videos
+
+<a name="chapter-image-video-processing"></a>
+### 2. Image / Video Processing ( resize, crop, etc.)
+
+##### 2.1 Image/Video Resize same as matlab2017
 - We use fatheral's python implementation of matLab imresize() function [fatheral/matlab_imresize](https://github.com/fatheral/matlab_imresize).
-- You can resize images/videos in batches that is same as matlab2017 imresize by following the demo:
+- Following the demo for batch operation:
 ```python
+# Images
 from utils.image_utils import batch_matlab_resize_images
 ori_root = '/path/to/ori images'
 dest_root = '/path/to/dest images'
 batch_matlab_resize_images(ori_root, dest_root, scale=2.0)
-```
-```python
+
+# Videos
 from utils.video_utils import batch_matlab_resize_videos
 ori_root = '/path/to/ori videos'
 dest_root = '/path/to/dest videos'
 batch_matlab_resize_videos(ori_root, dest_root, scale=2.0)
 ```
-- You can also resize images/videos using cv2 in batches by following the demo:
+- ***Image/Video Resize using opencv***
+- Following the demo for batch operation:
 ```python
 from utils.image_utils import batch_cv2_resize_images
 ori_root = '/path/to/ori images'
 dest_root = '/path/to/dest images'
 batch_cv2_resize_images(ori_root, dest_root, scale=2.0)
-```
-```python
+
+# Videos
 from utils.video_utils import batch_cv2_resize_videos
 ori_root = '/path/to/ori videos'
 dest_root = '/path/to/dest videos'
 batch_cv2_resize_videos(ori_root, dest_root, scale=2.0)
 ```
-   
-<a name="chapter-crop-combine-traverse"></a>
-### Crop and combine images
+
+##### 2.2 Crop and combine images
 - When you need to infer large image, you can crop image to many patches with padding by following the demo:
 ```python
 # Notice: 
 #   filenames should not contain the character "-"
 #   the crop flag "x-x-x-x" will be at the end of filename when cropping
+#   the combine operation will use the crop flag "x-x-x-x"
 from utils.image_crop_combine_utils import *
 ori_root = '/path/to/ori images'
 dest_root = '/path/to/dest images'
@@ -166,9 +181,10 @@ ori_root = '/path/to/ori images'
 dest_root = '/path/to/dest images'
 batch_select_valid_patch(ori_root, dest_root)
 ```
-   
+
+
 <a name="chapter-model-properties"></a>
-### Calculate the properties of deep model: Params, Flops, etc.
+### 3. Deep Model Properties ( Params, Flops, etc. )
 - You can only calculate model Params by following the demo:
 ```python
 from utils.dnn_utils import cal_parmeters
@@ -190,8 +206,11 @@ input_size = (3, 80, 80)  # the size of input (channel, height, width)
 stat(network, input_size)
 ```
 
-<a name="chapter-csv"></a>
-### Operate csv file
+
+<a name="chapter-file-processing"></a>
+### 4. File Processing ( csv, etc. )
+
+##### 4.1 csv file
 - You can read a csv file by following the demo:
 ```python
 from base import file_io_base
@@ -209,8 +228,11 @@ data_array = np.array([[1, 2, 3, 4],
 file_io_base.write_csv('filename.csv', data_array, col_names, row_names)
 ```
 
-<a name="chapter-plot-multi-curve"></a>
-### Plot multiple curves in one figure
+
+<a name="chapter-visualize-tools"></a>
+### 5. Visualize Tools ( plot, optical-flow, etc. )
+
+##### 5.1 Plot multiple curves in one figure
 - You plot multiple curves in one figure by following the demo:
 ```python
 import numpy as np
@@ -223,8 +245,7 @@ label_list = ['curve-1', 'curve-2']
 plot_utils.plot_multi_curve(array_list, label_list)
 ```
 
-<a name="chapter-flow-visual"></a>
-### Visualize optical flow
+##### 5.2 Visualize optical flow
 - You can visualize optical flow by following the demo:
 ```python
 from utils import flow_utils
