@@ -9,9 +9,7 @@ pd.set_option('display.max_columns', 10000)
 def round_value(value, binary=False):
     divisor = 1024. if binary else 1000.
 
-    if value // divisor**4 > 0:
-        return str(round(value / divisor**4, 2)) + 'T'
-    elif value // divisor**3 > 0:
+    if value // divisor**3 > 0:
         return str(round(value / divisor**3, 2)) + 'G'
     elif value // divisor**2 > 0:
         return str(round(value / divisor**2, 2)) + 'M'

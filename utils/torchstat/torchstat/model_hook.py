@@ -19,7 +19,7 @@ class ModelHook(object):
         self._origin_call = dict()  # sub module call hook
 
         self._hook_model()
-        x = torch.rand(1, *self._input_size)  # add module duration time
+        x = torch.rand(1, *self._input_size).to('cuda')  # add module duration time
         self._model.eval()
         self._model(x)
 
@@ -44,7 +44,7 @@ class ModelHook(object):
             assert module.__class__ in self._origin_call
 
             # Itemsize for memory
-            itemsize = input[0].detach().numpy().itemsize
+            itemsize = input[0].cpu().detach().numpy().itemsize
 
             start = time.time()
             output = self._origin_call[module.__class__](module, *input, **kwargs)

@@ -193,10 +193,15 @@ cal_parmeters(network)
 ```
 - You can also calculate more properties of model: Params, Memory, MAdd, Flops, etc.
 - We use Swall0w's tools [Swall0w/torchstat](https://github.com/Swall0w/torchstat).
-- You should first run the commands to install torchstat:
+- [Swall0w/torchstat] can not use cuda, so we modified it for using cuda. If you want to calculate Flops on cuda, please using the following command to install torchstat.
 ```shell script
 cd ./utils/torchstat
-python setup.py install
+python3 setup.py install
+```
+-If you do not want to using cuda, please using the following command to install torchstat.
+```shell script
+pip install torchstat  # pytorch >= 1.0.0
+pip install torchstat==0.0.6  # pytorch < 1.0.0
 ```
 - And then you can calculate properties by following the demo:
 ```python
