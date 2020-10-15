@@ -198,10 +198,10 @@ cal_parmeters(network)
 cd ./utils/torchstat
 python3 setup.py install
 ```
--If you do not want to using cuda, please using the following command to install torchstat.
+- If you do not want to using cuda, please using the following command to install torchstat.
 ```shell script
 pip install torchstat  # pytorch >= 1.0.0
-pip install torchstat==0.0.6  # pytorch < 1.0.0
+pip install torchstat==0.0.6  # pytorch = 0.4.1
 ```
 - And then you can calculate properties by following the demo:
 ```python
