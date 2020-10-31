@@ -29,6 +29,43 @@ def matlab_imresize(img, scalar_scale=None, output_shape=None, method='bicubic')
     )
 
 
+def image_shift(img, offset_x=0., offset_y=0.):
+    '''shift the img by (offset_x, offset_y) on (axis-x, axis-y)
+    img: numpy.array, shape=[h, w, c]
+    offset_x: offset pixels on axis-x
+        positive=left; negative=right
+    offset_y: offset pixels on axis-y
+        positive=up; negative=down
+    '''
+    img_tensor = torch.from_numpy(img.transpose(2, 0, 1)).unsqueeze(0).float()
+    B, C, H, W = img_tensor.size()
+
+    # init flow
+    flo = torch.ones(B, 2, H, W).type_as(img_tensor)
+    flo[:, 0, :, :] *= offset_x
+    flo[:, 1, :, :] *= offset_y
+
+    # mesh grid
+    xx = torch.arange(0, W).view(1, -1).repeat(H, 1)
+    yy = torch.arange(0, H).view(-1, 1).repeat(1, W)
+    xx = xx.view(1, 1, H, W).repeat(B, 1, 1, 1)
+    yy = yy.view(1, 1, H, W).repeat(B, 1, 1, 1)
+    grid = torch.cat((xx, yy), 1).float()
+    vgrid = Variable(grid) + flo
+
+    # scale grid to [-1,1]
+    vgrid[:, 0, :, :] = 2.0 * vgrid[:, 0, :, :].clone() / max(W - 1, 1) - 1.0
+    vgrid[:, 1, :, :] = 2.0 * vgrid[:, 1, :, :].clone() / max(H - 1, 1) - 1.0
+
+    # Interpolation
+    vgrid = vgrid.permute(0, 2, 3, 1)
+    output_tensor = F.grid_sample(img_tensor, vgrid, padding_mode='border')
+
+    output = output_tensor.round()[0].detach().numpy().transpose(1, 2, 0).astype(img.dtype)
+
+    return output
+
+
 def rgb2ycbcr(img, range=255., only_y=True):
     """same as matlab rgb2ycbcr, please use bgr2ycbcr when using cv2.imread
     img: shape=[h, w, 3]
@@ -155,6 +192,25 @@ def SSIM(img1, img2):
             return ssim(np.squeeze(img1), np.squeeze(img2))
     else:
         raise ValueError('Wrong input image dimensions.')
+
+
+def PSNR_SSIM_Shift_Best(img1, img2, window_size=5):
+    '''
+    img1, img2: [0, 255]
+    '''
+    img1 = img1.astype(np.float64)
+    img2 = img2.astype(np.float64)
+    img1 = img1[window_size:-window_size, window_size:-window_size, :]
+    best_psnr, best_ssim = 0., 0.
+    for i in range(-window_size, window_size + 1):
+        for j in range(-window_size, window_size + 1):
+            shifted_img2 = image_shift(img2, offset_x=i, offset_y=j)
+            shifted_img2 = shifted_img2[window_size:-window_size, window_size:-window_size, :]
+            psnr = PSNR(img1, shifted_img2)
+            ssim = SSIM(img1, shifted_img2)
+            best_psnr = max(best_psnr, psnr)
+            best_ssim = max(best_ssim, ssim)
+    return best_psnr, best_ssim
 
 
 #################################################################################

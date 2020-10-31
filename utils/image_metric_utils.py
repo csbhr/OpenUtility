@@ -7,7 +7,7 @@ from base.os_base import listdir
 import utils.PerceptualSimilarity.models as lpips_models
 
 
-def calc_image_PSNR_SSIM(output_root, gt_root, crop_border=4, test_ycbcr=False, crop_GT=False):
+def calc_image_PSNR_SSIM(output_root, gt_root, crop_border=4, shift_window_size=0, test_ycbcr=False, crop_GT=False):
     '''
     计算图片的 PSNR、SSIM，使用 EDVR 的计算方式
     要求 output_root, gt_root 中的文件按顺序一一对应
@@ -50,8 +50,12 @@ def calc_image_PSNR_SSIM(output_root, gt_root, crop_border=4, test_ycbcr=False, 
             cropped_GT = im_GT
             cropped_Gen = im_Gen
 
-        psnr = image_base.PSNR(cropped_GT * 255, cropped_Gen * 255)
-        ssim = image_base.SSIM(cropped_GT * 255, cropped_Gen * 255)
+        if shift_window_size == 0:
+            psnr = image_base.PSNR(cropped_GT * 255, cropped_Gen * 255)
+            ssim = image_base.SSIM(cropped_GT * 255, cropped_Gen * 255)
+        else:
+            psnr, ssim = image_base.PSNR_SSIM_Shift_Best(cropped_GT * 255, cropped_Gen * 255,
+                                                         window_size=shift_window_size)
         PSNR_list.append(psnr)
         SSIM_list.append(ssim)
 
@@ -63,7 +67,7 @@ def calc_image_PSNR_SSIM(output_root, gt_root, crop_border=4, test_ycbcr=False, 
     return PSNR_list, SSIM_list, log
 
 
-def batch_calc_image_PSNR_SSIM(root_list, crop_border=4, test_ycbcr=False, crop_GT=False):
+def batch_calc_image_PSNR_SSIM(root_list, crop_border=4, shift_window_size=0, test_ycbcr=False, crop_GT=False):
     '''
     required params:
         root_list: a list, each item should be a dictionary that given two key-values:
@@ -71,6 +75,7 @@ def batch_calc_image_PSNR_SSIM(root_list, crop_border=4, test_ycbcr=False, crop_
             gt: the dir of gt images
     optional params:
         crop_border: defalut=4, crop pixels when calculating PSNR/SSIM
+        shift_window_size: defalut=0, if >0, shifting image within a window for best metric
         test_ycbcr: default=False, if True, applying Ycbcr color space
         crop_GT: default=False, if True, cropping GT to output size
     return:
@@ -85,8 +90,10 @@ def batch_calc_image_PSNR_SSIM(root_list, crop_border=4, test_ycbcr=False, crop_
         print(">>>>  Now Evaluation >>>>")
         print(">>>>  OUTPUT: {}".format(ouput_root))
         print(">>>>  GT: {}".format(gt_root))
-        _, _, log = calc_image_PSNR_SSIM(ouput_root, gt_root,
-                                         crop_border=crop_border, test_ycbcr=test_ycbcr, crop_GT=crop_GT)
+        _, _, log = calc_image_PSNR_SSIM(
+            ouput_root, gt_root, crop_border=crop_border, shift_window_size=shift_window_size,
+            test_ycbcr=test_ycbcr, crop_GT=crop_GT
+        )
         log_list.append({
             'data_path': ouput_root,
             'log': log

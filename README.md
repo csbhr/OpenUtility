@@ -5,7 +5,7 @@
 There are some useful tools for low-level vision tasks.
 
 - [Calculating Metrics ( PSNR, SSIM, etc.)](#chapter-calculating-metrics)
-- [Image / Video Processing ( resize, crop, etc.)](#chapter-image-video-processing)
+- [Image / Video Processing ( resize, crop, shift, etc.)](#chapter-image-video-processing)
 - [Deep Model Properties ( Params, Flops, etc. )](#chapter-model-properties)
 - [File Processing ( csv, etc. )](#chapter-file-processing)
 - [Visualize Tools ( plot, optical-flow, etc. )](#chapter-visualize-tools)
@@ -112,7 +112,7 @@ batch_calc_kernel_gradient_similarity(root_list, video_type=False)
 
 
 <a name="chapter-image-video-processing"></a>
-### 2. Image / Video Processing ( resize, crop, etc.)
+### 2. Image / Video Processing ( resize, crop, shift, etc.)
 
 ##### 2.1 Image/Video Resize
 - We use fatheral's python implementation of matLab imresize() function [fatheral/matlab_imresize](https://github.com/fatheral/matlab_imresize).
@@ -180,6 +180,23 @@ from utils.image_crop_combine_utils import *
 ori_root = '/path/to/ori images'
 dest_root = '/path/to/dest images'
 batch_select_valid_patch(ori_root, dest_root)
+```
+
+##### 2.3 Image/Video Shift
+- We use "Bilinear" interpolation method to shift images/videos for sub-pixels.
+- Following the demo for batch operation:
+```python
+# Images
+from utils.image_utils import batch_shift_images
+ori_root = '/path/to/ori images'
+dest_root = '/path/to/dest images'
+batch_shift_images(ori_root, dest_root, offset_x=0.5, offset_y=0.5)
+
+# Videos
+from utils.video_utils import batch_shift_videos
+ori_root = '/path/to/ori videos'
+dest_root = '/path/to/dest videos'
+batch_shift_videos(ori_root, dest_root, offset_x=0.5, offset_y=0.5)
 ```
 
 

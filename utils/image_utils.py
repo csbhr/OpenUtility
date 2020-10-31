@@ -2,7 +2,7 @@ import os
 import cv2
 import numpy as np
 from base.os_base import handle_dir, get_fname_ext, listdir
-from base.image_base import matlab_imresize
+from base.image_base import matlab_imresize, image_shift
 
 
 def batch_matlab_resize_images(ori_root, dest_root, scale=1.0, method='bicubic', filename_template="{}.png"):
@@ -61,6 +61,30 @@ def batch_cv2_resize_images(ori_root, dest_root, scale=1.0, method='bicubic', fi
         img = cv2.resize(img, dsize=(0, 0), fx=scale, fy=scale, interpolation=interpolation)
         cv2.imwrite(os.path.join(dest_root, filename_template.format(get_fname_ext(imf)[0])), img)
         print("Image", imf, "resize done !")
+
+
+def batch_shift_images(ori_root, dest_root, offset_x=0., offset_y=0., filename_template="{}.png"):  # TODO
+    '''
+    function:
+        shifting images by (offset_x, offset_y) on (axis-x, axis-y) in batches
+    params:
+        ori_root: string, the dir of images that need to be processed
+        dest_root: string, the dir to save processed images
+        offset_x: float, offset pixels on axis-x
+            positive=left; negative=right
+        offset_y: float, offset pixels on axis-y
+            positive=up; negative=down
+        filename_template: string, the filename template for saving images
+    '''
+
+    handle_dir(dest_root)
+    offset_x, offset_y = float(offset_x), float(offset_y)
+    images_fname = sorted(listdir(ori_root))
+    for imf in images_fname:
+        img = cv2.imread(os.path.join(ori_root, imf)).astype('float32')
+        img = image_shift(img, offset_x=offset_x, offset_y=offset_y)
+        cv2.imwrite(os.path.join(dest_root, filename_template.format(get_fname_ext(imf)[0])), img)
+        print("Image", imf, "shift done !")
 
 
 def margin_patch(patch, margin_width=5):

@@ -1,6 +1,6 @@
 import os
 from base.os_base import handle_dir, copy_file, listdir
-from utils.image_utils import batch_cv2_resize_images, batch_matlab_resize_images
+from utils.image_utils import batch_cv2_resize_images, batch_matlab_resize_images, batch_shift_images
 
 
 def batch_matlab_resize_videos(ori_root, dest_root, scale=1.0, method='bicubic', filename_template="{}.png"):
@@ -53,6 +53,32 @@ def batch_cv2_resize_videos(ori_root, dest_root, scale=1.0, method='bicubic', fi
             filename_template=filename_template
         )
         print("Video", v, "resize done !")
+
+
+def batch_shift_videos(ori_root, dest_root, offset_x=0., offset_y=0., filename_template="{}.png"):
+    '''
+    function:
+        shifting videos by (offset_x, offset_y) on (axis-x, axis-y) in batches
+    params:
+        ori_root: string, the dir of videos that need to be processed
+        dest_root: string, the dir to save processed videos
+        offset_x: float, offset pixels on axis-x
+            positive=left; negative=right
+        offset_y: float, offset pixels on axis-y
+            positive=up; negative=down
+        filename_template: string, the filename template for saving images
+    '''
+    handle_dir(dest_root)
+    videos = listdir(ori_root)
+    for v in videos:
+        batch_shift_images(
+            ori_root=os.path.join(ori_root, v),
+            dest_root=os.path.join(dest_root, v),
+            offset_x=offset_x,
+            offset_y=offset_y,
+            filename_template=filename_template
+        )
+        print("Video", v, "shift done !")
 
 
 def extra_frames_from_videos(ori_root, save_root, fname_template='%4d.png', start_end=None):
