@@ -138,6 +138,15 @@ def ycbcr2rgb(img, range=255.):
 ####                            Image PSNR SSIM                              ####
 #################################################################################
 
+def RMSE(img1, img2):
+    img1 = img1.astype(np.float64)
+    img2 = img2.astype(np.float64)
+    mse = np.mean((img1 - img2) ** 2)
+    if mse == 0:
+        return float('inf')
+    return math.sqrt(mse)
+
+
 def PSNR(img1, img2):
     '''
     img1, img2: [0, 255]

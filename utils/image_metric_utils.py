@@ -4,7 +4,9 @@ import torch
 import numpy as np
 from base import image_base
 from base.os_base import listdir
-import utils.PerceptualSimilarity.models as lpips_models
+from base import matlab_imresize
+import utils.LPIPS.models as lpips_models
+import utils.NIQE.niqe as cal_niqe
 
 
 def calc_image_PSNR_SSIM(output_root, gt_root, crop_border=4, shift_window_size=0, test_ycbcr=False, crop_GT=False):
@@ -175,6 +177,79 @@ def batch_calc_image_LPIPS(root_list, use_gpu=False, spatial=True):
         print(">>>>  OUTPUT: {}".format(ouput_root))
         print(">>>>  GT: {}".format(gt_root))
         _, log = calc_image_LPIPS(ouput_root, gt_root, model=model, use_gpu=use_gpu, spatial=spatial)
+        log_list.append({
+            'data_path': ouput_root,
+            'log': log
+        })
+
+    print("--------------------------------------------------------------------------------------")
+    for i, log in enumerate(log_list):
+        print("## The {}-th:".format(i))
+        print(">> ", log['data_path'])
+        print(">> ", log['log'])
+
+    return log_list
+
+
+def calc_image_NIQE(output_root, crop_border=4):
+    '''
+    计算图片的 NIQE
+    '''
+
+    NIQE_list = []
+    output_img_list = sorted(listdir(output_root))
+    for o_im in output_img_list:
+        o_im_path = os.path.join(output_root, o_im)
+        im_Gen = cv2.imread(o_im_path)
+        im_Gen = cv2.cvtColor(im_Gen, cv2.COLOR_BGR2GRAY)
+
+        # crop borders
+        if crop_border != 0:
+            if im_Gen.ndim == 3:
+                cropped_Gen = im_Gen[crop_border:-crop_border, crop_border:-crop_border, :]
+            elif im_Gen.ndim == 2:
+                cropped_Gen = im_Gen[crop_border:-crop_border, crop_border:-crop_border]
+            else:
+                raise ValueError('Wrong image dimension: {}. Should be 2 or 3.'.format(im_Gen.ndim))
+        else:
+            cropped_Gen = im_Gen
+
+        h, w = cropped_Gen.shape
+        if h < 193 or w < 193:
+            cropped_Gen = matlab_imresize.imresize(cropped_Gen, output_shape=(512, 512), method='bicubic')
+            # cropped_Gen = cv2.resize(cropped_Gen, dsize=(512, 512), interpolation=cv2.INTER_CUBIC)
+
+        niqe = cal_niqe.niqe(cropped_Gen)
+        NIQE_list.append(niqe)
+
+        print("{} NIQE={:.5}".format(o_im, niqe))
+
+    log = 'Average NIQE={:.5}'.format(sum(NIQE_list) / len(NIQE_list))
+    print(log)
+
+    return NIQE_list, log
+
+
+def batch_calc_image_NIQE(root_list, crop_border=4):
+    '''
+    required params:
+        root_list: a list, each item should be a dictionary that given key-values:
+            output: the dir of output images
+    optional params:
+        crop_border: defalut=4, crop pixels when calculating NIQE
+    return:
+        log_list: a list, each item is a dictionary that given two key-values:
+            data_path: the evaluated dir
+            log: the log of this dir
+    '''
+    log_list = []
+    for i, root in enumerate(root_list):
+        ouput_root = root['output']
+        print(">>>>  Now Evaluation >>>>")
+        print(">>>>  OUTPUT: {}".format(ouput_root))
+        _, log = calc_image_NIQE(
+            ouput_root, crop_border=crop_border
+        )
         log_list.append({
             'data_path': ouput_root,
             'log': log

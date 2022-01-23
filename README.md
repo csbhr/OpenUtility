@@ -91,12 +91,44 @@ root_list = [
 batch_calc_video_LPIPS(root_list)
 ```
 
-##### 1.3 Kernel Gradient Similarity
+##### 1.3 NIQE
+- Following the demo for batch operation:
+```python
+# Images
+from utils.image_metric_utils import batch_calc_image_NIQE
+root_list = [
+    {
+        'output': '/path/to/output images 1',
+        'gt': '/path/to/gt images 1'
+    },
+    {
+        'output': '/path/to/output images 2',
+        'gt': '/path/to/gt images 2'
+    },
+]
+batch_calc_image_NIQE(root_list)
+
+# Videos
+from utils.video_metric_utils import batch_calc_video_NIQE
+root_list = [
+    {
+        'output': '/path/to/output videos 1',
+        'gt': '/path/to/gt videos 1'
+    },
+    {
+        'output': '/path/to/output videos 2',
+        'gt': '/path/to/gt videos 2'
+    },
+]
+batch_calc_video_NIQE(root_list)
+```
+
+##### 1.4 Kernel Gradient Similarity
 - Following the demo for batch operation:
 ```python
 # Images: video_type=False
 # Videos: video_type=True
-from utils.kernel_metric_utils import batch_calc_kernel_gradient_similarity
+from utils.kernel_metric_utils import batch_calc_kernel_metric
 root_list = [
     {
         'output': '/path/to/output kernel 1',
@@ -107,7 +139,7 @@ root_list = [
         'gt': '/path/to/gt kernel 2'
     },
 ]
-batch_calc_kernel_gradient_similarity(root_list, video_type=False)
+batch_calc_kernel_metric(root_list, video_type=False)
 ```
 
 
@@ -117,32 +149,38 @@ batch_calc_kernel_gradient_similarity(root_list, video_type=False)
 ##### 2.1 Image/Video Resize
 - We use fatheral's python implementation of matLab imresize() function [fatheral/matlab_imresize](https://github.com/fatheral/matlab_imresize).
 - Following the demo for batch operation:
+
 ```python
 # Images
-from utils.image_utils import batch_matlab_resize_images
+from utils.image_utils import matlab_resize_images
+
 ori_root = '/path/to/ori images'
 dest_root = '/path/to/dest images'
-batch_matlab_resize_images(ori_root, dest_root, scale=2.0)
+matlab_resize_images(ori_root, dest_root, scale=2.0)
 
 # Videos
-from utils.video_utils import batch_matlab_resize_videos
+from utils.video_utils import matlab_resize_videos
+
 ori_root = '/path/to/ori videos'
 dest_root = '/path/to/dest videos'
-batch_matlab_resize_videos(ori_root, dest_root, scale=2.0)
+matlab_resize_videos(ori_root, dest_root, scale=2.0)
 ```
 - We also apply opencv for resizing.
 - Following the demo for batch operation:
+
 ```python
-from utils.image_utils import batch_cv2_resize_images
+from utils.image_utils import cv2_resize_images
+
 ori_root = '/path/to/ori images'
 dest_root = '/path/to/dest images'
-batch_cv2_resize_images(ori_root, dest_root, scale=2.0)
+cv2_resize_images(ori_root, dest_root, scale=2.0)
 
 # Videos
-from utils.video_utils import batch_cv2_resize_videos
+from utils.video_utils import cv2_resize_videos
+
 ori_root = '/path/to/ori videos'
 dest_root = '/path/to/dest videos'
-batch_cv2_resize_videos(ori_root, dest_root, scale=2.0)
+cv2_resize_videos(ori_root, dest_root, scale=2.0)
 ```
 
 ##### 2.2 Crop and combine images
@@ -185,18 +223,21 @@ batch_select_valid_patch(ori_root, dest_root)
 ##### 2.3 Image/Video Shift
 - We use "Bilinear" interpolation method to shift images/videos for sub-pixels.
 - Following the demo for batch operation:
+
 ```python
 # Images
-from utils.image_utils import batch_shift_images
+from utils.image_utils import shift_images
+
 ori_root = '/path/to/ori images'
 dest_root = '/path/to/dest images'
-batch_shift_images(ori_root, dest_root, offset_x=0.5, offset_y=0.5)
+shift_images(ori_root, dest_root, offset_x=0.5, offset_y=0.5)
 
 # Videos
-from utils.video_utils import batch_shift_videos
+from utils.video_utils import shift_videos
+
 ori_root = '/path/to/ori videos'
 dest_root = '/path/to/dest videos'
-batch_shift_videos(ori_root, dest_root, offset_x=0.5, offset_y=0.5)
+shift_videos(ori_root, dest_root, offset_x=0.5, offset_y=0.5)
 ```
 
 

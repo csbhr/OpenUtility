@@ -1,9 +1,9 @@
 import os
 from base.os_base import handle_dir, copy_file, listdir
-from utils.image_utils import batch_cv2_resize_images, batch_matlab_resize_images, batch_shift_images
+from utils.image_utils import cv2_resize_images, matlab_resize_images, shift_images
 
 
-def batch_matlab_resize_videos(ori_root, dest_root, scale=1.0, method='bicubic', filename_template="{}.png"):
+def matlab_resize_videos(ori_root, dest_root, scale=1.0, method='bicubic', filename_template="{}.png"):
     '''
     function:
         resizing videos in batches, same as matlab2017 imresize
@@ -19,7 +19,7 @@ def batch_matlab_resize_videos(ori_root, dest_root, scale=1.0, method='bicubic',
     handle_dir(dest_root)
     videos = listdir(ori_root)
     for v in videos:
-        batch_matlab_resize_images(
+        matlab_resize_images(
             ori_root=os.path.join(ori_root, v),
             dest_root=os.path.join(dest_root, v),
             scale=scale,
@@ -29,7 +29,7 @@ def batch_matlab_resize_videos(ori_root, dest_root, scale=1.0, method='bicubic',
         print("Video", v, "resize done !")
 
 
-def batch_cv2_resize_videos(ori_root, dest_root, scale=1.0, method='bicubic', filename_template="{}.png"):
+def cv2_resize_videos(ori_root, dest_root, scale=1.0, method='bicubic', filename_template="{}.png"):
     '''
     function:
         resizing videos in batches
@@ -45,7 +45,7 @@ def batch_cv2_resize_videos(ori_root, dest_root, scale=1.0, method='bicubic', fi
     handle_dir(dest_root)
     videos = listdir(ori_root)
     for v in videos:
-        batch_cv2_resize_images(
+        cv2_resize_images(
             ori_root=os.path.join(ori_root, v),
             dest_root=os.path.join(dest_root, v),
             scale=scale,
@@ -55,7 +55,7 @@ def batch_cv2_resize_videos(ori_root, dest_root, scale=1.0, method='bicubic', fi
         print("Video", v, "resize done !")
 
 
-def batch_shift_videos(ori_root, dest_root, offset_x=0., offset_y=0., filename_template="{}.png"):
+def shift_videos(ori_root, dest_root, offset_x=0., offset_y=0., filename_template="{}.png"):
     '''
     function:
         shifting videos by (offset_x, offset_y) on (axis-x, axis-y) in batches
@@ -71,7 +71,7 @@ def batch_shift_videos(ori_root, dest_root, offset_x=0., offset_y=0., filename_t
     handle_dir(dest_root)
     videos = listdir(ori_root)
     for v in videos:
-        batch_shift_images(
+        shift_images(
             ori_root=os.path.join(ori_root, v),
             dest_root=os.path.join(dest_root, v),
             offset_x=offset_x,

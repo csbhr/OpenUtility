@@ -5,7 +5,7 @@ from base.os_base import handle_dir, get_fname_ext, listdir
 from base.image_base import matlab_imresize, image_shift
 
 
-def batch_matlab_resize_images(ori_root, dest_root, scale=1.0, method='bicubic', filename_template="{}.png"):
+def matlab_resize_images(ori_root, dest_root, scale=1.0, method='bicubic', filename_template="{}.png"):
     '''
     function:
         resizing images in batches, same as matlab2017 imresize
@@ -31,7 +31,7 @@ def batch_matlab_resize_images(ori_root, dest_root, scale=1.0, method='bicubic',
         print("Image", imf, "resize done !")
 
 
-def batch_cv2_resize_images(ori_root, dest_root, scale=1.0, method='bicubic', filename_template="{}.png"):
+def cv2_resize_images(ori_root, dest_root, scale=1.0, method='bicubic', filename_template="{}.png"):
     '''
     function:
         resizing images in batches
@@ -63,7 +63,7 @@ def batch_cv2_resize_images(ori_root, dest_root, scale=1.0, method='bicubic', fi
         print("Image", imf, "resize done !")
 
 
-def batch_shift_images(ori_root, dest_root, offset_x=0., offset_y=0., filename_template="{}.png"):  # TODO
+def shift_images(ori_root, dest_root, offset_x=0., offset_y=0., filename_template="{}.png"):  # TODO
     '''
     function:
         shifting images by (offset_x, offset_y) on (axis-x, axis-y) in batches
