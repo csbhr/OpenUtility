@@ -5,25 +5,18 @@ import numpy as np
 #################################################################################
 ####                            csv file I/O                                 ####
 #################################################################################
-def read_csv(file_path, col_name_ind=None, row_name_ind=None):
+def read_csv(file_path):
     '''
     function:
-        read csv file into np.array
+        read csv file into list[list[]]
     required params:
         file_path: the csv file's path
-    optional params:
-        col_name_ind: int, the index of col names
-        row_name_ind: int, the index of row names
     return:
-        data_array: the np.array of csv file's content
-        col_names: the col names, if col_name_ind=None, return []
-        row_name_ind: the row names, if row_name_ind=None, return []
+        data_list: the csv file's content
     '''
-    csv_data = pd.read_csv(file_path, index_col=row_name_ind, header=col_name_ind)
-    row_names = [] if row_name_ind is None else list(csv_data.index)
-    col_names = [] if col_name_ind is None else list(csv_data.columns)
-    data_array = np.array(csv_data)
-    return data_array, col_names, row_names
+    csv_data = pd.read_csv(file_path)
+    data_list = csv_data.values.tolist()
+    return data_list
 
 
 def write_csv(file_path, data, col_names=None, row_names=None):
@@ -46,3 +39,22 @@ def write_csv(file_path, data, col_names=None, row_names=None):
         assert data.shape[1] == len(col_names), 'the number of data cols must equal to len(col_names)'
     data = pd.DataFrame(data, index=row_names, columns=col_names)
     data.to_csv(file_path, index=index, header=header)
+
+
+#################################################################################
+####                            excel file I/O                                 ####
+#################################################################################
+def read_excel(file_path, sheet_name=0):
+    '''
+    function:
+        read excel file into list[list[]]
+    required params:
+        file_path: the excel file's path
+    optional params:
+        sheet_name: int or str, the index/name of read sheet
+    return:
+        data_list: the excel file's content
+    '''
+    excel_data = pd.read_excel(file_path, sheet_name=sheet_name)
+    data_list = excel_data.values.tolist()
+    return data_list
