@@ -81,25 +81,19 @@ def shift_videos(ori_root, dest_root, offset_x=0., offset_y=0., filename_templat
         print("Video", v, "shift done !")
 
 
-def extra_frames_from_videos(ori_root, save_root, fname_template='%4d.png', start_end=None):
+def extra_frames_from_videos(ori_root, save_root, fname_template='%4d.png', ffmpeg_path='ffmpeg'):
     '''
     function:
         ext frames from videos
     params:
         ori_root: string, the dir of videos that need to be processed
-        dest_root: string, the dir to save processed videos
+        save_root: string, the dir to save processed frames
         fname_template: the template for frames' filename
-        start_end: list, len=2, the start and end index for processed videos,
-            assert: len(start_end)=2
-            default: None, that is processing all videos
+        ffmpeg_path: ffmpeg path
     '''
 
     handle_dir(save_root)
-
     videos = sorted(listdir(ori_root))
-    if start_end is not None:
-        assert len(start_end) == 2, "only support len(start_end)=2"
-        videos = videos[start_end[0]:start_end[1]]
 
     for v in videos:
         vn = v[:-(len(v.split('.')[-1]) + 1)]
@@ -107,36 +101,35 @@ def extra_frames_from_videos(ori_root, save_root, fname_template='%4d.png', star
         png_dir = os.path.join(save_root, vn)
         png_path = os.path.join(png_dir, fname_template)
         handle_dir(png_dir)
-        command = 'ffmpeg -i {} {}'.format(video_path, png_path)
+        command = '{} -i {} {}'.format(ffmpeg_path, video_path, png_path)
         os.system(command)
         print("Extra frames from {}".format(video_path))
 
 
-def zip_frames_to_videos(ori_root, save_root, fname_template='%4d.png', video_ext='mp4', start_end=None):
+def zip_frames_to_videos(ori_root, save_root, fname_template='%4d.png', video_ext='mkv', ffmpeg_path='ffmpeg'):
     '''
     function:
         zip frames to videos
     params:
-        ori_root: string, the dir of videos that need to be processed
-        dest_root: string, the dir to save processed videos
+        ori_root: string, the dir of frames that need to be processed
+        save_root: string, the dir to save processed videos
         fname_template: the template of frames' filename
-        start_end: list, len=2, the start and end index for processed videos,
-            assert: len(start_end)=2
-            default: None, that is processing all videos
+        video_ext: the extension of videos
+        ffmpeg_path: ffmpeg path
     '''
-    handle_dir(save_root)
 
+    handle_dir(save_root)
     videos_name = sorted(listdir(ori_root))
-    if start_end is not None:
-        assert len(start_end) == 2, "only support len(start_end)=2"
-        videos_name = videos_name[start_end[0]:start_end[1]]
 
     for vn in videos_name:
         imgs_path = os.path.join(ori_root, vn, fname_template)
         video_path = os.path.join(save_root, '{}.{}'.format(vn, video_ext))
-        command = 'ffmpeg -i {} -vcodec libx264 -crf 16 -pix_fmt yuv420p {}'.format(imgs_path, video_path)
-        # command = 'ffmpeg -r 24000/1001 -i {} -vcodec libx265 -pix_fmt yuv422p -crf 10 {}'.format(
-        #     imgs_path, video_path)  # youku competition
+        command = '{} -i {} -c:v libx265 -x265-params lossless=1 {}'.format(
+            ffmpeg_path, imgs_path, video_path
+        )  # NTIRE 2022 Super-Resolution and Quality Enhancement of Compressed Video
+        # command = '{} -r 24000/1001 -i {} -vcodec libx265 -pix_fmt yuv422p -crf 10 {}'.format(
+        #     ffmpeg_path, imgs_path, video_path
+        # )  # youku competition
         os.system(command)
         print("Zip frames to {}".format(video_path))
 
